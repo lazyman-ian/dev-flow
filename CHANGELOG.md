@@ -4,6 +4,16 @@ All notable changes to dev-flow-plugin will be documented in this file.
 
 Author: lazyman
 
+## [3.6.2] - 2026-01-11
+
+### Changed
+- Bundle MCP server to single `scripts/mcp-server.cjs` file using esbuild
+- No more TypeScript compilation required on plugin install
+- Update `.mcp.json` to use bundled file
+
+### Fixed
+- Plugin installation failure when `mcp-server/dist/` not compiled
+
 ## [3.6.1] - 2026-01-11
 
 ### Added

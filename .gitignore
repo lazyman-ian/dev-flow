@@ -7,6 +7,9 @@ dist/
 build/
 *.js.map
 
+# Keep bundled MCP server
+!scripts/mcp-server.cjs
+
 # OS files
 .DS_Store
 Thumbs.db
