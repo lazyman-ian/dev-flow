@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dev-flow.local/schemas/evaluation.json",
+  "title": "Session Evaluation",
+  "description": "Schema for meta-iterate evaluation output",
+  "type": "object",
+  "required": ["evaluation_id", "session_count", "period", "overall_score", "components", "recommendations"],
+  "properties": {
+    "evaluation_id": {
+      "type": "string",
+      "pattern": "^EVAL-\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Unique evaluation identifier"
+    },
+    "session_count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Number of sessions analyzed"
+    },
+    "period": {
+      "type": "string",
+      "description": "Date range of analyzed sessions"
+    },
+    "overall_score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Overall quality score"
+    },
+    "components": {
+      "type": "object",
+      "description": "Per-component evaluation results",
+      "additionalProperties": {
+        "$ref": "#/$defs/componentScore"
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/recommendation"
+      },
+      "description": "Prioritized improvement recommendations"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "braintrust_project": {
+          "type": "string"
+        },
+        "filter_type": {
+          "type": "string",
+          "enum": ["agent", "skill", "rule", "all"]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "componentScore": {
+      "type": "object",
+      "required": ["score", "usage_count"],
+      "properties": {
+        "score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Component quality score"
+        },
+        "usage_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of times component was used"
+        },
+        "avg_tokens": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Average token consumption"
+        },
+        "completion_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Task completion rate"
+        },
+        "retry_rate": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Retry/loop occurrence rate"
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Identified issues"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["healthy", "needs_attention", "critical", "insufficient_data"],
+          "description": "Component health status"
+        }
+      }
+    },
+    "recommendation": {
+      "type": "object",
+      "required": ["component", "priority", "reason"],
+      "properties": {
+        "component": {
+          "type": "string",
+          "description": "Component file path"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"],
+          "description": "Recommendation priority"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Why this component needs attention"
+        },
+        "suggested_action": {
+          "type": "string",
+          "description": "Suggested improvement action"
+        }
+      }
+    }
+  }
+}

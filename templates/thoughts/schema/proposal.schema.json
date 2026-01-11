@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dev-flow.local/schemas/proposal.json",
+  "title": "Improvement Proposal",
+  "description": "Schema for meta-iterate improvement proposals",
+  "type": "object",
+  "required": ["proposal_id", "evaluation_ref", "changes", "status"],
+  "properties": {
+    "proposal_id": {
+      "type": "string",
+      "pattern": "^PROP-\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Unique proposal identifier"
+    },
+    "evaluation_ref": {
+      "type": "string",
+      "description": "Reference to source evaluation"
+    },
+    "diagnosis_ref": {
+      "type": "string",
+      "description": "Reference to diagnosis report"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "pending_review", "approved", "rejected", "applied", "verified"],
+      "description": "Proposal lifecycle status"
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/change"
+      },
+      "description": "Proposed changes"
+    },
+    "expected_impact": {
+      "$ref": "#/$defs/impact",
+      "description": "Expected improvement metrics"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "applied_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reviewer": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "change": {
+      "type": "object",
+      "required": ["component", "type", "description"],
+      "properties": {
+        "component": {
+          "type": "string",
+          "description": "Target component file path"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["modify", "add", "remove", "restructure"],
+          "description": "Type of change"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable change description"
+        },
+        "diff": {
+          "type": "string",
+          "description": "Unified diff format of changes"
+        },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/alternative"
+          },
+          "description": "Alternative approaches considered"
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Why this change is recommended"
+        },
+        "risk_level": {
+          "type": "string",
+          "enum": ["low", "medium", "high"],
+          "description": "Risk assessment"
+        },
+        "rollback_plan": {
+          "type": "string",
+          "description": "How to rollback if issues arise"
+        }
+      }
+    },
+    "alternative": {
+      "type": "object",
+      "required": ["name", "description"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Alternative name (e.g., 'Option A')"
+        },
+        "description": {
+          "type": "string",
+          "description": "What this alternative involves"
+        },
+        "pros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommended": {
+          "type": "boolean",
+          "description": "Whether this is the recommended option"
+        }
+      }
+    },
+    "impact": {
+      "type": "object",
+      "properties": {
+        "token_reduction_pct": {
+          "type": "number",
+          "description": "Expected token reduction percentage"
+        },
+        "completion_improvement_pct": {
+          "type": "number",
+          "description": "Expected task completion improvement"
+        },
+        "user_satisfaction_delta": {
+          "type": "number",
+          "description": "Expected user satisfaction change"
+        },
+        "risk_assessment": {
+          "type": "string",
+          "description": "Overall risk assessment"
+        }
+      }
+    }
+  }
+}
