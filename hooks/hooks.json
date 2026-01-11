@@ -3,13 +3,13 @@
     "SessionStart": [
       {
         "type": "command",
-        "command": "${CLAUDE_PLUGIN_ROOT}/scripts/session-start.sh"
+        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start-continuity.sh"
       }
     ],
     "PreCompact": [
       {
-        "type": "prompt",
-        "prompt": "Before compacting context, update the continuity ledger with current progress. Use dev_ledger(action='status') to check current state, then remind user to manually update checkboxes if needed."
+        "type": "command",
+        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-compact.sh"
       }
     ],
     "PostToolUse": [
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/detect-git-action.sh \"$TOOL_INPUT\" \"$TOOL_OUTPUT\""
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/dev-workflow.sh"
           }
         ]
       }

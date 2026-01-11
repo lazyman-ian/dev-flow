@@ -4,6 +4,12 @@ All notable changes to dev-flow-plugin will be documented in this file.
 
 Author: lazyman
 
+## [3.6.1] - 2026-01-11
+
+### Added
+- Complete hooks to plugin: dev-workflow.sh, session-start-continuity.sh, pre-compact.sh
+- Self-contained hook configuration in hooks.json
+
 ## [3.6.0] - 2026-01-11
 
 ### Added
