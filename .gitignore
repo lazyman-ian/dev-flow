@@ -7,8 +7,9 @@ dist/
 build/
 *.js.map
 
-# Keep bundled MCP server
+# Keep bundled files for self-contained plugin
 !scripts/mcp-server.cjs
+!hooks/dist/
 
 # OS files
 .DS_Store

@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
-cd ~/.claude/hooks
+
+# Self-contained: use script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Get session type from stdin (pass through)
 INPUT=$(cat)
@@ -13,8 +15,8 @@ if [[ "$AGENT_TYPE" != "main" && "$AGENT_TYPE" != "unknown" ]]; then
     exit 0
 fi
 
-# Run main continuity handler
-OUTPUT=$(echo "$INPUT" | node dist/session-start-continuity.mjs)
+# Run main continuity handler (self-contained)
+OUTPUT=$(echo "$INPUT" | node "$SCRIPT_DIR/dist/session-start-continuity.mjs")
 
 # Branch change detection
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
@@ -48,11 +50,20 @@ fi
 
 # For startup, add ledger summary and tip to the message
 if [[ "$SESSION_TYPE" == "startup" ]]; then
-    # Get ledger summary (if exists)
-    LEDGER_SUMMARY=$("$HOME/.claude/scripts/ledger-manager.sh" summary 2>/dev/null || true)
+    # Get ledger summary (if exists) - cascading lookup
+    PLUGIN_SCRIPTS="$SCRIPT_DIR/../scripts"
+    if [[ -x "$PLUGIN_SCRIPTS/ledger-manager.sh" ]]; then
+        LEDGER_SUMMARY=$("$PLUGIN_SCRIPTS/ledger-manager.sh" summary 2>/dev/null || true)
+    else
+        LEDGER_SUMMARY=$("$HOME/.claude/scripts/ledger-manager.sh" summary 2>/dev/null || true)
+    fi
 
-    # Get tip
-    TIP=$("$HOME/.claude/scripts/show-tip.sh" 2>/dev/null || echo "💡 /dev commit - 提交代码")
+    # Get tip - cascading lookup
+    if [[ -x "$PLUGIN_SCRIPTS/show-tip.sh" ]]; then
+        TIP=$("$PLUGIN_SCRIPTS/show-tip.sh" 2>/dev/null || echo "💡 /dev commit - 提交代码")
+    else
+        TIP=$("$HOME/.claude/scripts/show-tip.sh" 2>/dev/null || echo "💡 /dev commit - 提交代码")
+    fi
 
     # Check PR status for merged PRs (suggest archive)
     PR_STATUS_MSG=""

@@ -26,6 +26,6 @@ if [[ -d "$project_dir/thoughts/ledgers" ]]; then
     fi
 fi
 
-# Run main continuity handler
-cd ~/.claude/hooks
-cat | node dist/pre-compact-continuity.mjs
+# Run main continuity handler (self-contained)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cat | node "$SCRIPT_DIR/dist/pre-compact-continuity.mjs"

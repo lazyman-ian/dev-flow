@@ -17,7 +17,13 @@ if [[ "$TOOL_NAME" != "Bash" ]] || [[ "$EXIT_CODE" != "0" ]]; then
 fi
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
-SCRIPTS_DIR="$HOME/.claude/scripts"
+PLUGIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Cascading lookup: plugin scripts first, then user's global scripts
+if [[ -d "$PLUGIN_DIR/scripts" ]]; then
+    SCRIPTS_DIR="$PLUGIN_DIR/scripts"
+else
+    SCRIPTS_DIR="$HOME/.claude/scripts"
+fi
 
 # Helper: Get current branch
 get_branch() {
