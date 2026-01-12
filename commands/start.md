@@ -2,15 +2,15 @@
 description: Start new task - create branch, ledger, and optionally plan
 ---
 
-# /dev start - 开始新任务
+# /dev-flow:start - 开始新任务
 
 自动创建分支和 ledger，可选创建实现计划。
 
 ## 语法
 
 ```
-/dev start TASK-XXX "描述"
-/dev start TASK-XXX "描述" --plan    # 同时创建计划
+/dev-flow:start TASK-XXX "描述"
+/dev-flow:start TASK-XXX "描述" --plan    # 同时创建计划
 ```
 
 ## 自动执行流程
@@ -82,7 +82,7 @@ dev_ledger(action="create", taskId="TASK-XXX", branch="<branch>")
 
 如果带 `--plan` 参数：
 ```
-→ 自动触发 /dev plan
+→ 自动触发 /dev-flow:plan
 ```
 
 ## 输出
@@ -96,19 +96,19 @@ dev_ledger(action="create", taskId="TASK-XXX", branch="<branch>")
 | 类型 | feature |
 | Ledger | thoughts/ledgers/TASK-123.md |
 
-🎯 下一步: 开发 → `make fix` → `/dev commit`
+🎯 下一步: 开发 → `make fix` → `/dev-flow:commit`
 ```
 
 ## 示例
 
 ```bash
-/dev start TASK-945 "添加 Google reCAPTCHA 验证"
+/dev-flow:start TASK-945 "添加 Google reCAPTCHA 验证"
 # → feature/TASK-945-add-google-recaptcha
 
-/dev start TASK-773 "修复图片浏览崩溃"
+/dev-flow:start TASK-773 "修复图片浏览崩溃"
 # → fix/TASK-773-fix-image-crash
 
-/dev start TASK-800 "优化首页加载速度" --plan
+/dev-flow:start TASK-800 "优化首页加载速度" --plan
 # → perf/TASK-800-optimize-homepage-loading
 # → 同时创建实现计划
 ```

@@ -72,7 +72,7 @@ Author: lazyman
 - TDD workflow integration
 
 ### Changed
-- Unified `/dev` command interface
+- Unified `/dev-flow:` command interface
 - Platform-agnostic design (iOS, Android, Web)
 
 ## [2.0.0] - 2025-12-20
@@ -87,5 +87,5 @@ Author: lazyman
 
 ### Added
 - Initial release
-- Basic `/dev commit`, `/dev pr`, `/dev release` commands
+- Basic `/dev-flow:commit`, `/dev-flow:pr`, `/dev-flow:release` commands
 - Git workflow automation

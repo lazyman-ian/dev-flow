@@ -2,7 +2,7 @@
 description: Create PR with auto-push, auto-description, auto-review
 ---
 
-# /dev pr - 创建 Pull Request
+# /dev-flow:pr - 创建 Pull Request
 
 自动推送、生成描述、触发代码审查。
 
@@ -13,12 +13,12 @@ description: Create PR with auto-push, auto-description, auto-review
 ```bash
 git status --short           # 检查未提交
 git log origin/master..HEAD  # 检查未推送
-gh pr view 2>/dev/null       # 检查已有 PR
+gh pr view 2>/dev-flow/null       # 检查已有 PR
 ```
 
 | 状态 | 处理 |
 |------|------|
-| 有未提交更改 | 自动触发 `/dev commit` |
+| 有未提交更改 | 自动触发 `/dev-flow:commit` |
 | 有未推送提交 | 自动 `git push -u origin HEAD` |
 | PR 已存在 | 显示 PR 链接，询问是否更新描述 |
 
@@ -119,10 +119,10 @@ dev_ledger(action="update", content="PR created: #123")
 
 | 选项 | 说明 |
 |------|------|
-| `/dev pr` | 自动生成一切 |
-| `/dev pr --draft` | 创建 Draft PR |
-| `/dev pr --no-review` | 跳过代码审查 |
-| `/dev pr --update` | 更新现有 PR 描述 |
+| `/dev-flow:pr` | 自动生成一切 |
+| `/dev-flow:pr --draft` | 创建 Draft PR |
+| `/dev-flow:pr --no-review` | 跳过代码审查 |
+| `/dev-flow:pr --update` | 更新现有 PR 描述 |
 
 ## 代码审查输出
 

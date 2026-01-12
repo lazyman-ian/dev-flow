@@ -2,7 +2,7 @@
 description: Create release tag with auto-version and changelog
 ---
 
-# /dev release - 发布版本
+# /dev-flow:release - 发布版本
 
 自动生成版本号、创建 tag、生成 Release Notes。
 
@@ -111,8 +111,8 @@ gh release create v1.3.0 \
 
 | 选项 | 说明 |
 |------|------|
-| `/dev release` | 自动建议版本 |
-| `/dev release 1.3.0` | 指定版本 |
-| `/dev release --patch` | 强制 patch |
-| `/dev release --minor` | 强制 minor |
-| `/dev release --dry-run` | 预览不执行 |
+| `/dev-flow:release` | 自动建议版本 |
+| `/dev-flow:release 1.3.0` | 指定版本 |
+| `/dev-flow:release --patch` | 强制 patch |
+| `/dev-flow:release --minor` | 强制 minor |
+| `/dev-flow:release --dry-run` | 预览不执行 |

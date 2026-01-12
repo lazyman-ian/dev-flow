@@ -34,7 +34,7 @@ Analyze token usage for the current session.
 
    ## Quick Actions
      /clear              - Reset context
-     /dev ledger         - Check task progress
+     /dev-flow:ledger         - Check task progress
    ```
 
 4. **Thresholds**:

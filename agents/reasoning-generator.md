@@ -75,4 +75,4 @@ This reasoning documentation helps future developers (including yourself) unders
 - What didn't work and why
 - The context that informed decisions
 
-Use `/dev recall "keyword"` to search this history later.
+Use `/dev-flow:recall "keyword"` to search this history later.

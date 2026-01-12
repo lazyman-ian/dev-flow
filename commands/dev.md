@@ -2,7 +2,7 @@
 description: Development workflow hub - auto-detect phase and suggest actions
 ---
 
-# /dev - 开发工作流中心
+# /dev-flow:dev - 开发工作流中心
 
 智能检测当前状态，自动建议下一步操作。
 
@@ -35,12 +35,12 @@ description: Development workflow hub - auto-detect phase and suggest actions
 
 | 阶段 | 状态 | 自动建议 |
 |------|------|---------|
-| `IDLE` | master + 无更改 | `/dev start TASK-XXX "描述"` |
-| `DEVELOPING` | 有未提交更改 | `make fix` → `/dev commit` |
+| `IDLE` | master + 无更改 | `/dev-flow:start TASK-XXX "描述"` |
+| `DEVELOPING` | 有未提交更改 | `make fix` → `/dev-flow:commit` |
 | `READY_TO_PUSH` | 有未推送提交 | `git push` |
-| `READY_FOR_PR` | 已推送，无 PR | `/dev pr` |
-| `PR_OPEN` | PR 已创建 | 等待审核 或 `/dev describe` |
-| `READY_TO_RELEASE` | master + 新提交 | `/dev release` |
+| `READY_FOR_PR` | 已推送，无 PR | `/dev-flow:pr` |
+| `PR_OPEN` | PR 已创建 | 等待审核 或 `/dev-flow:describe` |
+| `READY_TO_RELEASE` | master + 新提交 | `/dev-flow:release` |
 
 ## 错误处理
 
@@ -55,9 +55,9 @@ description: Development workflow hub - auto-detect phase and suggest actions
 
 | 输入 | 等效 |
 |------|------|
-| `/dev` | 显示状态 + 建议 |
-| `/dev s` | `/dev start` |
-| `/dev c` | `/dev commit` |
-| `/dev p` | `/dev pr` |
-| `/dev r` | `/dev release` |
-| `/dev d` | `/dev describe` |
+| `/dev-flow:dev` | 显示状态 + 建议 |
+| `/dev-flow:s` | `/dev-flow:start` |
+| `/dev-flow:c` | `/dev-flow:commit` |
+| `/dev-flow:p` | `/dev-flow:pr` |
+| `/dev-flow:r` | `/dev-flow:release` |
+| `/dev-flow:d` | `/dev-flow:describe` |

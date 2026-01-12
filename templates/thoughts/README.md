@@ -51,10 +51,10 @@ What you're trying to achieve
 ## Commands
 
 ```bash
-/dev ledger          # View current ledger
-/dev ledger list     # List all ledgers
-/dev ledger archive  # Archive completed
-/dev recall "keyword" # Search history
+/dev-flow:ledger          # View current ledger
+/dev-flow:ledger list     # List all ledgers
+/dev-flow:ledger archive  # Archive completed
+/dev-flow:recall "keyword" # Search history
 ```
 
 ## Best Practices

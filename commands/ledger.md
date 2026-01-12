@@ -2,17 +2,17 @@
 description: Manage continuity ledgers for task tracking
 ---
 
-# /dev ledger - 状态账本管理
+# /dev-flow:ledger - 状态账本管理
 
 管理任务状态、进度跟踪、跨 session 持久化。
 
 ## 语法
 
 ```
-/dev ledger              # 显示当前状态
-/dev ledger list         # 列出所有
-/dev ledger search XXX   # 搜索
-/dev ledger archive      # 归档当前
+/dev-flow:ledger              # 显示当前状态
+/dev-flow:ledger list         # 列出所有
+/dev-flow:ledger search XXX   # 搜索
+/dev-flow:ledger archive      # 归档当前
 ```
 
 ## 操作
@@ -73,7 +73,7 @@ dev_ledger(action="archive", taskId="TASK-XXX")
 dev_ledger(action="update", content="...")
 ```
 
-由 `/dev commit` 等命令自动调用。
+由 `/dev-flow:commit` 等命令自动调用。
 
 ## Ledger 结构
 
@@ -107,8 +107,8 @@ dev_ledger(action="update", content="...")
 
 | 触发 | 自动更新 |
 |------|---------|
-| `/dev start` | 创建 ledger |
-| `/dev commit` | 记录提交 |
-| `/dev pr` | 记录 PR 链接 |
+| `/dev-flow:start` | 创建 ledger |
+| `/dev-flow:commit` | 记录提交 |
+| `/dev-flow:pr` | 记录 PR 链接 |
 | Context 压缩前 | PreCompact hook 保存状态 |
 | Session 恢复 | 自动加载 |

@@ -8,7 +8,7 @@ Create a detailed implementation plan through research and iteration.
 
 ### 1. Check Input
 
-If file path provided (e.g., `/dev plan thoughts/tickets/TASK-123.md`):
+If file path provided (e.g., `/dev-flow:plan thoughts/tickets/TASK-123.md`):
 - Read the ticket/requirement file
 - Begin research immediately
 
@@ -129,7 +129,7 @@ dev_ledger(action="update", content="Plan created: [path]")
 ## Examples
 
 ```bash
-/dev plan                                    # Interactive
-/dev plan thoughts/tickets/TASK-123.md       # From ticket
-/dev plan think deeply about auth system     # Deep analysis
+/dev-flow:plan                                    # Interactive
+/dev-flow:plan thoughts/tickets/TASK-123.md       # From ticket
+/dev-flow:plan think deeply about auth system     # Deep analysis
 ```

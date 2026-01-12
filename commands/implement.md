@@ -122,7 +122,7 @@ dev_ledger(action="update", content="Phase N complete")
 ### 6. Commit When Ready
 
 ```
-/dev commit
+/dev-flow:commit
 ```
 
 ## TDD Guidelines
@@ -142,9 +142,9 @@ dev_ledger(action="update", content="Phase N complete")
 ## Examples
 
 ```bash
-/dev implement thoughts/shared/plans/2025-01-10-auth.md
-/dev implement phase 2        # Continue specific phase
-/dev implement                 # Resume current plan
+/dev-flow:implement thoughts/shared/plans/2025-01-10-auth.md
+/dev-flow:implement phase 2        # Continue specific phase
+/dev-flow:implement                 # Resume current plan
 ```
 
 ## Handoff Chain

@@ -11,7 +11,7 @@
 - **状态持久化**: Ledger 跨 session 保持、Reasoning 记录决策历史
 - **质量保障**: 自动 `make fix` + `make check`
 - **平台支持**: iOS (Swift), Android (Kotlin), Web (TypeScript)
-- **自我迭代**: `/meta-iterate` 分析 session 表现，持续优化 agent/skill prompt
+- **自我迭代**: `/dev-flow:meta-iterate` 分析 session 表现，持续优化 agent/skill prompt
 
 ## 安装
 
@@ -35,7 +35,7 @@
 /plugins add dev-flow@lazyman-ian
 ```
 
-验证: 输入 `/dev` 查看开发状态。
+验证: 输入 `/dev-flow:dev` 查看开发状态。
 
 ## 命令概览
 
@@ -43,74 +43,74 @@
 
 | 命令 | 功能 | 自动化 |
 |------|------|--------|
-| `/dev` | 状态 + 下一步建议 | 阶段检测、错误提示 |
-| `/dev start` | 开始任务 | 创建分支、Ledger |
-| `/dev plan` | 创建计划 | 研究、设计、迭代 |
-| `/dev validate` | 验证计划 | 技术选型检查 |
-| `/dev implement` | 执行计划 | TDD + Agent 编排 |
-| `/dev commit` | 提交代码 | make fix、scope 推断、reasoning |
-| `/dev pr` | 创建 PR | 推送、描述、代码审查 |
-| `/dev release` | 发布版本 | 版本号、changelog |
+| `/dev-flow:dev` | 状态 + 下一步建议 | 阶段检测、错误提示 |
+| `/dev-flow:start` | 开始任务 | 创建分支、Ledger |
+| `/dev-flow:plan` | 创建计划 | 研究、设计、迭代 |
+| `/dev-flow:validate` | 验证计划 | 技术选型检查 |
+| `/dev-flow:implement` | 执行计划 | TDD + Agent 编排 |
+| `/dev-flow:commit` | 提交代码 | make fix、scope 推断、reasoning |
+| `/dev-flow:pr` | 创建 PR | 推送、描述、代码审查 |
+| `/dev-flow:release` | 发布版本 | 版本号、changelog |
 
 ### 辅助功能
 
 | 命令 | 功能 |
 |------|------|
-| `/dev ledger` | 状态账本管理 |
-| `/dev recall` | 搜索历史决策 |
-| `/dev describe` | 详细 PR 描述 |
-| `/dev tokens` | Token 使用分析 |
-| `/dev deps` | 依赖检查 |
-| `/dev switch` | 智能分支切换 |
-| `/dev cleanup` | 清理合并分支 |
+| `/dev-flow:ledger` | 状态账本管理 |
+| `/dev-flow:recall` | 搜索历史决策 |
+| `/dev-flow:describe` | 详细 PR 描述 |
+| `/dev-flow:tokens` | Token 使用分析 |
+| `/dev-flow:deps` | 依赖检查 |
+| `/dev-flow:switch` | 智能分支切换 |
+| `/dev-flow:cleanup` | 清理合并分支 |
 
 ### 自我迭代
 
 | 命令 | 功能 |
 |------|------|
-| `/meta-iterate` | 完整 5 阶段迭代流程 |
-| `/meta-iterate evaluate` | 评估 session 表现 |
-| `/meta-iterate diagnose` | 诊断问题根因 |
-| `/meta-iterate propose` | 生成改进提案 |
-| `/meta-iterate apply` | 应用改进 (需人工审核) |
-| `/meta-iterate verify` | 验证改进效果 |
+| `/dev-flow:meta-iterate` | 完整 5 阶段迭代流程 |
+| `/dev-flow:meta-iterate evaluate` | 评估 session 表现 |
+| `/dev-flow:meta-iterate diagnose` | 诊断问题根因 |
+| `/dev-flow:meta-iterate propose` | 生成改进提案 |
+| `/dev-flow:meta-iterate apply` | 应用改进 (需人工审核) |
+| `/dev-flow:meta-iterate verify` | 验证改进效果 |
 
 ## 工作流
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    /dev start                           │
+│                  /dev-flow:start                        │
 │              创建分支 + Ledger                          │
 └─────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────┐
-│                    /dev plan (可选)                     │
+│                /dev-flow:plan (可选)                    │
 │           研究 → 设计 → 生成实现计划                    │
 └─────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────┐
-│                  /dev validate (可选)                   │
+│              /dev-flow:validate (可选)                  │
 │              验证技术选型 (2024-2025)                   │
 └─────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────┐
-│                   /dev implement                        │
+│                 /dev-flow:implement                     │
 │              TDD (Red-Green-Refactor)                   │
 │              Agent 编排 (大任务)                        │
 └─────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────┐
-│                    /dev commit                          │
+│                  /dev-flow:commit                       │
 │     make fix → make check → commit → reasoning          │
 └─────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────┐
-│                      /dev pr                            │
+│                    /dev-flow:pr                         │
 │       push → 生成描述 (中文) → 代码审查                 │
 └─────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────┐
-│                    /dev release                         │
+│                  /dev-flow:release                      │
 │          版本建议 → Tag → Release Notes                 │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -157,28 +157,28 @@
 
 ```bash
 # 完整流程
-/meta-iterate
+/dev-flow:meta-iterate
 
 # 评估最近 20 个 sessions
-/meta-iterate evaluate --recent 20
+/dev-flow:meta-iterate evaluate --recent 20
 
 # 只关注特定 agent
-/meta-iterate --target agents/plan-agent.md
+/dev-flow:meta-iterate --target agents/plan-agent.md
 
 # 应用改进 (需要先 propose)
-/meta-iterate apply
+/dev-flow:meta-iterate apply
 
 # 验证效果 (需要新 sessions)
-/meta-iterate verify --iteration ITER-001
+/dev-flow:meta-iterate verify --iteration ITER-001
 ```
 
 ### 自动提醒
 
-每 10 个 session 后，系统会自动提醒运行 `/meta-iterate`。
+每 10 个 session 后，系统会自动提醒运行 `/dev-flow:meta-iterate`。
 
 ## 自动化细节
 
-### /dev commit
+### /dev-flow:commit
 
 ```
 1. make fix          # 自动格式化
@@ -190,10 +190,10 @@
 7. dev_ledger        # 更新状态
 ```
 
-### /dev pr
+### /dev-flow:pr
 
 ```
-1. 检查未提交 → /dev commit
+1. 检查未提交 → /dev-flow:commit
 2. 检查未推送 → git push
 3. dev_commits       # 收集提交
 4. dev_reasoning     # 聚合 reasoning

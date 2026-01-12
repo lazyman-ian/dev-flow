@@ -204,7 +204,7 @@ fi
 
 ### With dev workflow
 ```
-/dev → Shows current state
+/dev-flow:dev → Shows current state
 /config-optimize → Ensures dev-flow uses latest features
 ```
 

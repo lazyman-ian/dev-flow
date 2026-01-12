@@ -41,9 +41,9 @@ Switch branches with automatic stash management. Arguments: BRANCH
 ## Examples
 
 ```bash
-/dev switch feature/TASK-123-new-feature
-/dev switch master
-/dev switch fix/TASK-456-hotfix
+/dev-flow:switch feature/TASK-123-new-feature
+/dev-flow:switch master
+/dev-flow:switch fix/TASK-456-hotfix
 ```
 
 ## Related Commands

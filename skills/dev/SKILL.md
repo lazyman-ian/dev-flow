@@ -1,6 +1,6 @@
 ---
 name: dev
-description: Development workflow hub for git operations, commits, PRs, and releases. Use when user says "commit", "push", "create PR", "release", "git status", "check status", or any git workflow task. Triggers on keywords like /dev, 提交, 发布, PR.
+description: Development workflow hub for git operations, commits, PRs, and releases. Use when user says "commit", "push", "create PR", "release", "git status", "check status", or any git workflow task. Triggers on keywords like /dev-flow:dev, 提交, 发布, PR.
 model: sonnet
 allowed-tools: [Bash, Read, Glob, Grep, Edit, Write, mcp__plugin_dev-flow_dev-flow__*]
 ---
@@ -11,19 +11,19 @@ Cross-platform development workflow powered by dev-flow MCP.
 
 ## When to Use
 
-Use `/dev` commands for all Git workflow operations:
+Use `/dev-flow:` commands for all Git workflow operations:
 
 | Command | Purpose |
 |---------|---------|
-| `/dev` | Check status + next step |
-| `/dev start` | Start new task (branch + ledger) |
-| `/dev commit` | Create commit with reasoning |
-| `/dev pr` | Create pull request |
-| `/dev release` | Create release tag |
-| `/dev ledger` | Manage continuity ledgers |
-| `/dev recall` | Search historical decisions |
-| `/dev cleanup` | Clean merged branches |
-| `/dev switch` | Smart branch switching |
+| `/dev-flow:dev` | Check status + next step |
+| `/dev-flow:start` | Start new task (branch + ledger) |
+| `/dev-flow:commit` | Create commit with reasoning |
+| `/dev-flow:pr` | Create pull request |
+| `/dev-flow:release` | Create release tag |
+| `/dev-flow:ledger` | Manage continuity ledgers |
+| `/dev-flow:recall` | Search historical decisions |
+| `/dev-flow:cleanup` | Clean merged branches |
+| `/dev-flow:switch` | Smart branch switching |
 
 ## Core Principles
 
@@ -53,12 +53,12 @@ IDLE → DEVELOPING → READY_TO_PUSH → WAITING_QA → PR_OPEN → READY_TO_RE
 
 | Phase | Action |
 |-------|--------|
-| IDLE | `/dev start TASK-XXX` |
-| DEVELOPING | `make fix` → `/dev commit` |
+| IDLE | `/dev-flow:start TASK-XXX` |
+| DEVELOPING | `make fix` → `/dev-flow:commit` |
 | READY_TO_PUSH | `git push` |
-| WAITING_QA | `/dev pr` |
+| WAITING_QA | `/dev-flow:pr` |
 | PR_OPEN | Wait for merge |
-| READY_TO_RELEASE | `/dev release` |
+| READY_TO_RELEASE | `/dev-flow:release` |
 
 ## Commit Guidelines
 
@@ -70,31 +70,31 @@ IDLE → DEVELOPING → READY_TO_PUSH → WAITING_QA → PR_OPEN → READY_TO_RE
 ## Ledger Integration
 
 ```
-/dev start → Creates ledger
-/dev commit → Updates ledger + generates reasoning
-/dev pr → Records PR URL
-/dev ledger archive → Archives completed task
+/dev-flow:start → Creates ledger
+/dev-flow:commit → Updates ledger + generates reasoning
+/dev-flow:pr → Records PR URL
+/dev-flow:ledger archive → Archives completed task
 ```
 
 ## Quick Reference
 
 ```bash
 # Check status
-/dev
+/dev-flow:dev
 
 # Start new task
-/dev start TASK-123 "Add feature"
+/dev-flow:start TASK-123 "Add feature"
 
 # Commit changes
-make fix && /dev commit
+make fix && /dev-flow:commit
 
 # Create PR
-/dev pr
+/dev-flow:pr
 
 # Search past decisions
-/dev recall "authentication"
+/dev-flow:recall "authentication"
 
 # Clean up
-/dev cleanup
-/dev ledger archive
+/dev-flow:cleanup
+/dev-flow:ledger archive
 ```

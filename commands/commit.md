@@ -2,7 +2,7 @@
 description: Smart commit - auto-fix, auto-scope, auto-reasoning
 ---
 
-# /dev commit - 智能提交
+# /dev-flow:commit - 智能提交
 
 自动检查、修复、生成 commit message 和 reasoning。
 
@@ -20,7 +20,7 @@ make check  # 验证
 
 [错误详情]
 
-修复后再次运行 `/dev commit`
+修复后再次运行 `/dev-flow:commit`
 ```
 
 ### Step 2: 分析变更
@@ -118,9 +118,9 @@ dev_ledger(action="update", content="Committed: <hash-short>")
 
 | 选项 | 说明 |
 |------|------|
-| `/dev commit` | 自动生成 message |
-| `/dev commit "message"` | 使用指定 message |
-| `/dev commit --amend` | 修改上次提交 (谨慎) |
+| `/dev-flow:commit` | 自动生成 message |
+| `/dev-flow:commit "message"` | 使用指定 message |
+| `/dev-flow:commit --amend` | 修改上次提交 (谨慎) |
 
 ## 重要
 
