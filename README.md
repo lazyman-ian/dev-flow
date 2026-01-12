@@ -201,6 +201,18 @@
 6. code-reviewer     # 自动代码审查
 ```
 
+### Hooks（自动启用）
+
+插件安装后以下 hooks 自动生效，无需配置：
+
+| Hook | 触发时机 | 功能 |
+|------|---------|------|
+| **SessionStart** | 恢复 session (resume/compact/clear) | 自动加载 ledger 上下文 |
+| **PreCompact** | Context 压缩前 | 备份 transcript 到 `.git/claude/transcripts/` |
+| **PostToolUse** | 执行 Bash 命令后 | 提醒使用 `/dev` 命令代替原始 git 操作 |
+
+**位置**: `hooks/hooks.json` (标准路径自动加载)
+
 ## MCP 工具
 
 | 工具 | Tokens | 功能 |

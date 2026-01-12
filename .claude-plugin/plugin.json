@@ -1,6 +1,6 @@
 {
   "name": "dev-flow",
-  "version": "3.7.0",
+  "version": "3.7.1",
   "description": "Unified development workflow: planning → coding → commit → PR → release with full automation",
   "author": {
     "name": "lazyman"
@@ -20,6 +20,5 @@
   ],
   "skills": "./skills/",
   "commands": "./commands/",
-  "hooks": "./hooks/hooks.json",
   "mcpServers": "./.mcp.json"
 }

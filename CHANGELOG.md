@@ -4,6 +4,16 @@ All notable changes to dev-flow-plugin will be documented in this file.
 
 Author: lazyman
 
+## [3.7.1] - 2026-01-12
+
+### Fixed
+- Remove `"hooks"` field from `plugin.json` to avoid duplicate hooks loading error
+- Hooks now use standard path auto-loading mechanism
+
+### Documentation
+- Add Hooks section to README explaining auto-enabled features
+- Clarify that hooks work automatically without user configuration
+
 ## [3.7.0] - 2026-01-12
 
 ### Changed
