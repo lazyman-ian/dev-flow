@@ -4,6 +4,16 @@ All notable changes to dev-flow-plugin will be documented in this file.
 
 Author: lazyman
 
+## [3.7.0] - 2026-01-12
+
+### Changed
+- **BREAKING**: Rename command files from `dev-*.md` to `*.md` (shorter names)
+- Update README.md to use full skill names (`/dev-flow:dev` instead of `/dev`)
+- Simplify hooks.json configuration
+
+### Added
+- CLAUDE.md project documentation for Claude Code
+
 ## [3.6.2] - 2026-01-11
 
 ### Changed
