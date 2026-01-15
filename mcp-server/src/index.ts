@@ -146,8 +146,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
             description: 'Action to perform',
           },
           taskId: { type: 'string', description: 'Task ID (TASK-XXX) for create/archive' },
-          branch: { type: 'string', description: 'Branch name (for create) or commit message (for update)' },
+          branch: { type: 'string', description: 'Branch name (for create)' },
           keyword: { type: 'string', description: 'Search keyword' },
+          commitHash: { type: 'string', description: 'Commit hash (for update)' },
+          commitMessage: { type: 'string', description: 'Commit message (for update)' },
         },
       },
     },
@@ -337,7 +339,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return platformConfig(args?.format as string);
       // Continuity tools
       case 'dev_ledger':
-        return ledgerTool(args?.action as string, args?.taskId as string, args?.branch as string, args?.keyword as string);
+        return ledgerTool(args?.action as string, args?.taskId as string, args?.branch as string, args?.keyword as string, args?.commitHash as string, args?.commitMessage as string);
       case 'dev_reasoning':
         return reasoningTool(args?.action as string, args?.commitHash as string, args?.commitMessage as string, args?.keyword as string, args?.baseBranch as string);
       case 'dev_branch':
@@ -787,7 +789,7 @@ function platformConfig(format?: string) {
 
 // Continuity tool handlers
 
-function ledgerTool(action?: string, taskId?: string, branch?: string, keyword?: string) {
+function ledgerTool(action?: string, taskId?: string, branch?: string, keyword?: string, commitHash?: string, commitMessage?: string) {
   switch (action) {
     case 'status':
       return { content: [{ type: 'text', text: continuity.ledgerStatus().message }] };
@@ -799,8 +801,8 @@ function ledgerTool(action?: string, taskId?: string, branch?: string, keyword?:
       const branchName = branch || `feature/${taskId}-new`;
       return { content: [{ type: 'text', text: continuity.ledgerCreate(taskId, branchName).message }] };
     case 'update':
-      if (!taskId || !branch) return { content: [{ type: 'text', text: '❌ commitHash (as name) and commitMessage (as branch) required' }] };
-      return { content: [{ type: 'text', text: continuity.ledgerUpdate(taskId, branch).message }] };
+      if (!commitHash || !commitMessage) return { content: [{ type: 'text', text: '❌ commitHash and commitMessage required for update' }] };
+      return { content: [{ type: 'text', text: continuity.ledgerUpdate(commitHash, commitMessage).message }] };
     case 'archive':
       return { content: [{ type: 'text', text: continuity.ledgerArchive(taskId).message }] };
     case 'search':

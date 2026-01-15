@@ -22367,8 +22367,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
             description: "Action to perform"
           },
           taskId: { type: "string", description: "Task ID (TASK-XXX) for create/archive" },
-          branch: { type: "string", description: "Branch name (for create) or commit message (for update)" },
-          keyword: { type: "string", description: "Search keyword" }
+          branch: { type: "string", description: "Branch name (for create)" },
+          keyword: { type: "string", description: "Search keyword" },
+          commitHash: { type: "string", description: "Commit hash (for update)" },
+          commitMessage: { type: "string", description: "Commit message (for update)" }
         }
       }
     },
@@ -22546,7 +22548,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return platformConfig(args?.format);
       // Continuity tools
       case "dev_ledger":
-        return ledgerTool(args?.action, args?.taskId, args?.branch, args?.keyword);
+        return ledgerTool(args?.action, args?.taskId, args?.branch, args?.keyword, args?.commitHash, args?.commitMessage);
       case "dev_reasoning":
         return reasoningTool(args?.action, args?.commitHash, args?.commitMessage, args?.keyword, args?.baseBranch);
       case "dev_branch":
@@ -22905,7 +22907,7 @@ function platformConfig(format) {
     }]
   };
 }
-function ledgerTool(action, taskId, branch, keyword) {
+function ledgerTool(action, taskId, branch, keyword, commitHash, commitMessage) {
   switch (action) {
     case "status":
       return { content: [{ type: "text", text: ledgerStatus().message }] };
@@ -22917,8 +22919,8 @@ function ledgerTool(action, taskId, branch, keyword) {
       const branchName = branch || `feature/${taskId}-new`;
       return { content: [{ type: "text", text: ledgerCreate(taskId, branchName).message }] };
     case "update":
-      if (!taskId || !branch) return { content: [{ type: "text", text: "\u274C commitHash (as name) and commitMessage (as branch) required" }] };
-      return { content: [{ type: "text", text: ledgerUpdate(taskId, branch).message }] };
+      if (!commitHash || !commitMessage) return { content: [{ type: "text", text: "\u274C commitHash and commitMessage required for update" }] };
+      return { content: [{ type: "text", text: ledgerUpdate(commitHash, commitMessage).message }] };
     case "archive":
       return { content: [{ type: "text", text: ledgerArchive(taskId).message }] };
     case "search":
