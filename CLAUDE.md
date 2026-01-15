@@ -24,7 +24,7 @@ npm run dev       # Run with ts-node
 ### Plugin Structure
 
 ```
-.claude-plugin/plugin.json  # Plugin manifest (v3.7.1)
+.claude-plugin/plugin.json  # Plugin manifest (v3.8.0)
 .mcp.json                   # MCP server config → scripts/mcp-server.cjs
 skills/                     # 7 skills (SKILL.md + references/)
 commands/                   # 20 command definitions
@@ -130,7 +130,7 @@ Agents in `agents/` are spawned via Task tool for complex operations:
 - `plan-agent.md` - Create implementation plans
 - `implement-agent.md` - TDD execution
 - `code-reviewer.md` - PR review
-- `evaluate/diagnose/propose/apply/verify-agent.md` - Meta-iterate cycle
+- `evaluate/diagnose/propose/apply/verify-agent.md` - Meta-iterate cycle (includes `discover` for new skill opportunities)
 
 ## Conventions
 
