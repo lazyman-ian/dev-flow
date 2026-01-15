@@ -2,7 +2,7 @@ import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export type ProjectType = 'ios' | 'android' | 'unknown';
+export type ProjectType = 'ios' | 'android' | 'custom' | 'makefile' | 'unknown';
 
 export interface ProjectInfo {
   type: ProjectType;
@@ -10,6 +10,60 @@ export interface ProjectInfo {
   path: string;
   srcDir: string;
   configFiles: string[];
+}
+
+/**
+ * Custom platform configuration from .dev-flow.json
+ */
+export interface DevFlowConfig {
+  platform: string;
+  commands: {
+    fix: string;
+    check: string;
+    build?: string;
+  };
+  scopes?: string[];
+}
+
+/**
+ * Load project-level .dev-flow.json configuration
+ * Returns null if not found or invalid
+ */
+export function loadProjectConfig(projectPath: string = process.cwd()): DevFlowConfig | null {
+  const configPath = path.join(projectPath, '.dev-flow.json');
+  if (!fs.existsSync(configPath)) {
+    return null;
+  }
+  try {
+    const content = fs.readFileSync(configPath, 'utf-8');
+    const config = JSON.parse(content);
+    // Validate required fields
+    if (config.platform && config.commands?.fix && config.commands?.check) {
+      return config as DevFlowConfig;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Check if Makefile has fix and check targets
+ */
+export function hasMakefileTargets(projectPath: string = process.cwd()): boolean {
+  const makefile = path.join(projectPath, 'Makefile');
+  if (!fs.existsSync(makefile)) {
+    return false;
+  }
+  try {
+    const content = fs.readFileSync(makefile, 'utf-8');
+    // Check for fix: and check: targets (at start of line)
+    const hasFix = /^fix\s*:/m.test(content);
+    const hasCheck = /^check\s*:/m.test(content);
+    return hasFix && hasCheck;
+  } catch {
+    return false;
+  }
 }
 
 /**

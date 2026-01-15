@@ -11,7 +11,7 @@ import {
   ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 
-import { detectProjectType, getAvailableTools, ProjectInfo } from './detector';
+import { detectProjectType, getAvailableTools, ProjectInfo, loadProjectConfig, hasMakefileTargets, DevFlowConfig } from './detector';
 import { getWorkflowStatus, getGitStatus, WorkflowStatus } from './git/workflow';
 import { analyzeChanges, getPRStatus, togglePRReady, getBuildControlStatus, ChangeAnalysis, PRStatus } from './git/build-control';
 import { getVersionInfo, getCommitsSummary, formatCommitsForReleaseNotes, VersionInfo, CommitsSummary } from './git/version';
@@ -703,19 +703,66 @@ function commitsInfo(from?: string, to?: string, format?: string) {
 }
 
 // Platform config (~50 tokens)
+// Priority: .dev-flow.json > Makefile with fix/check > auto-detect
 function platformConfig(format?: string) {
+  // 1. Check for project-level .dev-flow.json (highest priority)
+  const customConfig = loadProjectConfig();
+  if (customConfig) {
+    const config = {
+      platform: customConfig.platform,
+      lintFix: customConfig.commands.fix,
+      lintCheck: customConfig.commands.check,
+      buildCmd: customConfig.commands.build || '',
+      scopes: customConfig.scopes || [],
+      source: '.dev-flow.json'
+    };
+
+    if (format === 'json') {
+      return { content: [{ type: 'text', text: JSON.stringify(config, null, 2) }] };
+    }
+    return {
+      content: [{
+        type: 'text',
+        text: `${config.platform}|fix:${config.lintFix}|check:${config.lintCheck}|scopes:${config.scopes.join(',')}|src:custom`
+      }]
+    };
+  }
+
+  // 2. Check for Makefile with fix and check targets
+  if (hasMakefileTargets()) {
+    const config = {
+      platform: 'makefile',
+      lintFix: 'make fix',
+      lintCheck: 'make check',
+      buildCmd: 'make build',
+      scopes: [],
+      source: 'Makefile'
+    };
+
+    if (format === 'json') {
+      return { content: [{ type: 'text', text: JSON.stringify(config, null, 2) }] };
+    }
+    return {
+      content: [{
+        type: 'text',
+        text: `makefile|fix:make fix|check:make check|scopes:|src:Makefile`
+      }]
+    };
+  }
+
+  // 3. Auto-detect platform (fallback)
   const project = getCached('project', CACHE_TTL.project, detectProjectType);
 
   let config: any;
   if (project.type === 'ios') {
-    config = ios.getPlatformConfig(project);
+    config = { ...ios.getPlatformConfig(project), source: 'auto-detect' };
   } else if (project.type === 'android') {
-    config = android.getPlatformConfig();
+    config = { ...android.getPlatformConfig(), source: 'auto-detect' };
   } else {
     return {
       content: [{
         type: 'text',
-        text: 'unknown|no platform config available'
+        text: 'unknown|no platform config|Create .dev-flow.json or Makefile with fix/check targets'
       }]
     };
   }
@@ -733,7 +780,7 @@ function platformConfig(format?: string) {
   return {
     content: [{
       type: 'text',
-      text: `${config.platform}|fix:${config.lintFix}|check:${config.lintCheck}|scopes:${config.scopes.join(',')}`
+      text: `${config.platform}|fix:${config.lintFix}|check:${config.lintCheck}|scopes:${config.scopes.join(',')}|src:auto`
     }]
   };
 }

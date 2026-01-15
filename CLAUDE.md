@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-dev-flow-plugin is a Claude Code plugin providing unified development workflow automation: planning → coding → commit → PR → release. It supports iOS (Swift), Android (Kotlin), and Web (TypeScript) platforms.
+dev-flow-plugin is a Claude Code plugin providing unified development workflow automation: planning → coding → commit → PR → release. Built-in support for iOS (Swift) and Android (Kotlin), with extensible architecture for Python, Go, Rust, Node and other platforms.
 
 ## Build & Development
 
@@ -24,7 +24,7 @@ npm run dev       # Run with ts-node
 ### Plugin Structure
 
 ```
-.claude-plugin/plugin.json  # Plugin manifest (v3.6.2)
+.claude-plugin/plugin.json  # Plugin manifest (v3.7.1)
 .mcp.json                   # MCP server config → scripts/mcp-server.cjs
 skills/                     # 7 skills (SKILL.md + references/)
 commands/                   # 20 command definitions
@@ -48,13 +48,40 @@ Single-file bundle architecture using `@modelcontextprotocol/sdk`:
 | `platforms/android.ts` | ktlint, ktfmt integration |
 | `continuity/` | Ledgers, reasoning, branch management |
 
+### Platform Extension
+
+To add a new platform (e.g., Python, Go, Rust):
+
+1. **Update `detector.ts`**: Add detection logic based on project files
+2. **Create `platforms/xxx.ts`**: Implement lint/format/build commands
+
+```typescript
+// Example: platforms/python.ts
+export function getPythonCommands(): PlatformCommands {
+  return {
+    lint: 'ruff check .',
+    format: 'black .',
+    check: 'ruff check . && mypy .'
+  };
+}
+```
+
+| Platform | Detection Files | Lint | Format |
+|----------|----------------|------|--------|
+| iOS | `*.xcodeproj`, `Podfile` | SwiftLint | SwiftFormat |
+| Android | `build.gradle`, `AndroidManifest.xml` | ktlint | ktfmt |
+| Python | `pyproject.toml`, `requirements.txt` | ruff, mypy | black |
+| Go | `go.mod` | golangci-lint | gofmt |
+| Rust | `Cargo.toml` | clippy | rustfmt |
+| Node | `package.json` | eslint | prettier |
+
 ### Key MCP Tools
 
 | Tool | Tokens | Purpose |
 |------|--------|---------|
 | `dev_status` | ~30 | Quick status: `PHASE\|✅0\|next` |
 | `dev_flow` | ~100 | Full status table |
-| `dev_config` | ~50 | Platform commands (lint/format/build) |
+| `dev_config` | ~50 | Platform commands (auto-detected, no Makefile needed) |
 | `dev_ledger` | ~50 | Task continuity management |
 | `dev_defaults` | ~20 | Auto-infer scope from changes |
 
@@ -111,3 +138,41 @@ Agents in `agents/` are spawned via Task tool for complex operations:
 - Scope auto-inferred via `dev_defaults(action="scope")`
 - All `/dev-flow:*` commands use MCP tools internally
 - Platform detection is automatic based on project files
+- **No Makefile required**: `dev_config` returns platform-specific commands automatically
+
+## Command Adaptation
+
+The `dev_config` MCP tool returns platform-specific commands with this priority:
+
+```
+1. .dev-flow.json (project config) → highest priority
+2. Makefile with fix/check targets → second priority
+3. Auto-detect (iOS/Android) → fallback
+```
+
+### Custom Platform via .dev-flow.json
+
+Users can add any platform support without modifying plugin code:
+
+```json
+{
+  "platform": "python",
+  "commands": {
+    "fix": "black . && ruff check --fix .",
+    "check": "ruff check . && mypy ."
+  },
+  "scopes": ["api", "models", "utils"]
+}
+```
+
+### Makefile Convention
+
+If project has `Makefile` with `fix:` and `check:` targets, plugin uses `make fix/check` automatically.
+
+### Output Format
+
+```
+dev_config → python|fix:black .|check:ruff .|scopes:api,models|src:custom
+           → makefile|fix:make fix|check:make check|scopes:|src:Makefile
+           → ios|fix:swiftlint --fix|check:swiftlint|scopes:...|src:auto
+```

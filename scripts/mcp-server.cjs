@@ -20650,6 +20650,36 @@ var StdioServerTransport = class {
 var import_child_process = require("child_process");
 var fs = __toESM(require("fs"));
 var path = __toESM(require("path"));
+function loadProjectConfig(projectPath = process.cwd()) {
+  const configPath = path.join(projectPath, ".dev-flow.json");
+  if (!fs.existsSync(configPath)) {
+    return null;
+  }
+  try {
+    const content = fs.readFileSync(configPath, "utf-8");
+    const config2 = JSON.parse(content);
+    if (config2.platform && config2.commands?.fix && config2.commands?.check) {
+      return config2;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+function hasMakefileTargets(projectPath = process.cwd()) {
+  const makefile = path.join(projectPath, "Makefile");
+  if (!fs.existsSync(makefile)) {
+    return false;
+  }
+  try {
+    const content = fs.readFileSync(makefile, "utf-8");
+    const hasFix = /^fix\s*:/m.test(content);
+    const hasCheck = /^check\s*:/m.test(content);
+    return hasFix && hasCheck;
+  } catch {
+    return false;
+  }
+}
 function detectProjectType(projectPath = process.cwd()) {
   const files = fs.readdirSync(projectPath);
   const hasXcodeproj = files.some((f) => f.endsWith(".xcodeproj"));
@@ -22807,17 +22837,56 @@ function commitsInfo(from, to, format) {
   };
 }
 function platformConfig(format) {
+  const customConfig = loadProjectConfig();
+  if (customConfig) {
+    const config3 = {
+      platform: customConfig.platform,
+      lintFix: customConfig.commands.fix,
+      lintCheck: customConfig.commands.check,
+      buildCmd: customConfig.commands.build || "",
+      scopes: customConfig.scopes || [],
+      source: ".dev-flow.json"
+    };
+    if (format === "json") {
+      return { content: [{ type: "text", text: JSON.stringify(config3, null, 2) }] };
+    }
+    return {
+      content: [{
+        type: "text",
+        text: `${config3.platform}|fix:${config3.lintFix}|check:${config3.lintCheck}|scopes:${config3.scopes.join(",")}|src:custom`
+      }]
+    };
+  }
+  if (hasMakefileTargets()) {
+    const config3 = {
+      platform: "makefile",
+      lintFix: "make fix",
+      lintCheck: "make check",
+      buildCmd: "make build",
+      scopes: [],
+      source: "Makefile"
+    };
+    if (format === "json") {
+      return { content: [{ type: "text", text: JSON.stringify(config3, null, 2) }] };
+    }
+    return {
+      content: [{
+        type: "text",
+        text: `makefile|fix:make fix|check:make check|scopes:|src:Makefile`
+      }]
+    };
+  }
   const project = getCached("project", CACHE_TTL.project, detectProjectType);
   let config2;
   if (project.type === "ios") {
-    config2 = getPlatformConfig(project);
+    config2 = { ...getPlatformConfig(project), source: "auto-detect" };
   } else if (project.type === "android") {
-    config2 = getPlatformConfig2();
+    config2 = { ...getPlatformConfig2(), source: "auto-detect" };
   } else {
     return {
       content: [{
         type: "text",
-        text: "unknown|no platform config available"
+        text: "unknown|no platform config|Create .dev-flow.json or Makefile with fix/check targets"
       }]
     };
   }
@@ -22832,7 +22901,7 @@ function platformConfig(format) {
   return {
     content: [{
       type: "text",
-      text: `${config2.platform}|fix:${config2.lintFix}|check:${config2.lintCheck}|scopes:${config2.scopes.join(",")}`
+      text: `${config2.platform}|fix:${config2.lintFix}|check:${config2.lintCheck}|scopes:${config2.scopes.join(",")}|src:auto`
     }]
   };
 }

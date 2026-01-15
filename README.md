@@ -1,4 +1,4 @@
-# dev-flow Plugin v3.6
+# dev-flow Plugin v3.7
 
 统一的开发工作流: planning → coding → commit → PR → release
 
@@ -9,8 +9,8 @@
 - **完整工作流**: 从计划到发布的全流程自动化
 - **智能自动化**: 自动推断 scope、生成 commit message、PR 描述
 - **状态持久化**: Ledger 跨 session 保持、Reasoning 记录决策历史
-- **质量保障**: 自动 `make fix` + `make check`
-- **平台支持**: iOS (Swift), Android (Kotlin), Web (TypeScript)
+- **质量保障**: 自动执行平台对应的 lint/format 命令
+- **多平台支持**: iOS、Android 内置，可扩展至 Python、Go、Rust、Node 等
 - **自我迭代**: `/dev-flow:meta-iterate` 分析 session 表现，持续优化 agent/skill prompt
 
 ## 安装
@@ -48,7 +48,7 @@
 | `/dev-flow:plan` | 创建计划 | 研究、设计、迭代 |
 | `/dev-flow:validate` | 验证计划 | 技术选型检查 |
 | `/dev-flow:implement` | 执行计划 | TDD + Agent 编排 |
-| `/dev-flow:commit` | 提交代码 | make fix、scope 推断、reasoning |
+| `/dev-flow:commit` | 提交代码 | 自动格式化、scope 推断、reasoning |
 | `/dev-flow:pr` | 创建 PR | 推送、描述、代码审查 |
 | `/dev-flow:release` | 发布版本 | 版本号、changelog |
 
@@ -101,7 +101,7 @@
                            ↓
 ┌─────────────────────────────────────────────────────────┐
 │                  /dev-flow:commit                       │
-│     make fix → make check → commit → reasoning          │
+│     lint fix → lint check → commit → reasoning          │
 └─────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────┐
@@ -181,13 +181,14 @@
 ### /dev-flow:commit
 
 ```
-1. make fix          # 自动格式化
-2. make check        # 验证错误
-3. git diff --stat   # 分析变更
-4. dev_defaults      # 推断 scope
-5. git commit        # 生成 message (无 Claude 署名)
-6. dev_reasoning     # 保存决策历史
-7. dev_ledger        # 更新状态
+1. dev_config        # 获取平台命令
+2. lint fix          # 自动格式化 (swiftlint --fix / ktlint -F)
+3. lint check        # 验证错误 (swiftlint / ktlint)
+4. git diff --stat   # 分析变更
+5. dev_defaults      # 推断 scope
+6. git commit        # 生成 message (无 Claude 署名)
+7. dev_reasoning     # 保存决策历史
+8. dev_ledger        # 更新状态
 ```
 
 ### /dev-flow:pr
@@ -250,6 +251,124 @@
 | propose-agent | 生成改进提案 (多方案) |
 | apply-agent | 应用改进 (带备份) |
 | verify-agent | 验证改进效果 |
+
+## 平台支持
+
+### 内置平台
+
+| 平台 | Lint | Format | 检测文件 |
+|------|------|--------|---------|
+| **iOS** | SwiftLint | SwiftFormat | `*.xcodeproj`, `Podfile` |
+| **Android** | ktlint | ktfmt | `build.gradle`, `AndroidManifest.xml` |
+
+### 扩展新平台
+
+插件采用模块化架构，扩展新平台只需两步：
+
+**1. 添加检测规则** (`mcp-server/src/detector.ts`)
+
+```typescript
+// Python 检测
+const hasPyproject = files.includes('pyproject.toml');
+const hasRequirements = files.includes('requirements.txt');
+
+// Go 检测
+const hasGoMod = files.includes('go.mod');
+
+// Rust 检测
+const hasCargoToml = files.includes('Cargo.toml');
+
+// Node 检测
+const hasPackageJson = files.includes('package.json');
+```
+
+**2. 添加平台模块** (`mcp-server/src/platforms/xxx.ts`)
+
+```typescript
+export function getPythonCommands(): PlatformCommands {
+  return {
+    lint: 'ruff check .',
+    format: 'black . && ruff check --fix .',
+    build: 'pytest',
+    check: 'ruff check . && mypy .'
+  };
+}
+```
+
+### 扩展路线图
+
+| 平台 | Lint | Format | 状态 |
+|------|------|--------|------|
+| Python | ruff, mypy | black | 计划中 |
+| Go | golangci-lint | gofmt | 计划中 |
+| Rust | clippy | rustfmt | 计划中 |
+| Node | eslint | prettier | 计划中 |
+
+欢迎贡献新平台支持！
+
+### 命令适配机制
+
+插件通过 `dev_config` 工具自动检测并返回平台命令，**无需修改插件代码**。
+
+#### 检测优先级
+
+```
+1. .dev-flow.json (项目配置文件) → 最高优先级
+2. Makefile (包含 fix/check 目标) → 次优先级
+3. 自动检测 (iOS/Android) → 默认回退
+```
+
+#### 方式 1: 项目配置文件 (推荐)
+
+在项目根目录创建 `.dev-flow.json`：
+
+```json
+{
+  "platform": "python",
+  "commands": {
+    "fix": "black . && ruff check --fix .",
+    "check": "ruff check . && mypy ."
+  },
+  "scopes": ["api", "models", "utils"]
+}
+```
+
+示例配置：
+
+| 平台 | .dev-flow.json |
+|------|---------------|
+| Python | `{"platform":"python","commands":{"fix":"black .","check":"ruff . && mypy ."}}` |
+| Go | `{"platform":"go","commands":{"fix":"gofmt -w .","check":"golangci-lint run"}}` |
+| Rust | `{"platform":"rust","commands":{"fix":"cargo fmt","check":"cargo clippy"}}` |
+| Node | `{"platform":"node","commands":{"fix":"prettier -w .","check":"eslint ."}}` |
+
+#### 方式 2: Makefile
+
+如果项目已有 `Makefile` 且包含 `fix` 和 `check` 目标，插件会自动使用：
+
+```makefile
+fix:
+	black . && ruff check --fix .
+
+check:
+	ruff check . && mypy .
+```
+
+#### 方式 3: 自动检测
+
+对于 iOS/Android 项目，插件自动检测并使用内置命令，无需任何配置。
+
+#### 验证配置
+
+```bash
+# 查看当前使用的命令来源
+dev_config
+
+# 输出示例:
+# python|fix:black .|check:ruff .|scopes:api,models|src:custom    # 使用 .dev-flow.json
+# makefile|fix:make fix|check:make check|scopes:|src:Makefile     # 使用 Makefile
+# ios|fix:swiftlint --fix|check:swiftlint|scopes:...|src:auto     # 自动检测
+```
 
 ## 目录结构
 
