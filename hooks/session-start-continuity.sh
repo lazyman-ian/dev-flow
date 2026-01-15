@@ -1,13 +1,14 @@
 #!/bin/bash
-set -e
+# Relaxed: -e can cause issues with git/jq commands
+set -o pipefail
 
 # Self-contained: use script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Get session type from stdin (pass through)
 INPUT=$(cat)
-SESSION_TYPE=$(echo "$INPUT" | jq -r '.type // .source // "unknown"')
-AGENT_TYPE=$(echo "$INPUT" | jq -r '.agent_type // "main"')  # v2.1.2+: main, subagent, etc.
+SESSION_TYPE=$(echo "$INPUT" | jq -r '.type // .source // "unknown"' 2>/dev/null || echo "unknown")
+AGENT_TYPE=$(echo "$INPUT" | jq -r '.agent_type // "main"' 2>/dev/null || echo "main")  # v2.1.2+: main, subagent, etc.
 
 # Skip heavy processing for subagents (v2.1.2 optimization)
 if [[ "$AGENT_TYPE" != "main" && "$AGENT_TYPE" != "unknown" ]]; then
@@ -20,7 +21,13 @@ OUTPUT=$(echo "$INPUT" | node "$SCRIPT_DIR/dist/session-start-continuity.mjs")
 
 # Branch change detection
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
-BRANCH_CACHE="/tmp/claude-last-branch-$(echo "$PROJECT_DIR" | md5sum | cut -d' ' -f1).txt"
+# Cross-platform hash: md5 on macOS, md5sum on Linux
+if command -v md5 &>/dev/null; then
+    DIR_HASH=$(echo "$PROJECT_DIR" | md5 -q)
+else
+    DIR_HASH=$(echo "$PROJECT_DIR" | md5sum | cut -d' ' -f1)
+fi
+BRANCH_CACHE="/tmp/claude-last-branch-${DIR_HASH}.txt"
 CURRENT_BRANCH=$(git -C "$PROJECT_DIR" branch --show-current 2>/dev/null || echo "")
 LAST_BRANCH=""
 BRANCH_CHANGED=""

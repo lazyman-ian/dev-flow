@@ -1,8 +1,12 @@
 #!/bin/bash
-set -e
+# Relaxed: -e can cause issues with git commands in non-git dirs
+set -o pipefail
 
 # Update active ledger timestamp before compaction
-project_dir="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+project_dir="${CLAUDE_PROJECT_DIR:-}"
+if [[ -z "$project_dir" ]]; then
+    project_dir=$(git rev-parse --show-toplevel 2>/dev/null) || project_dir=$(pwd)
+fi
 if [[ -d "$project_dir/thoughts/ledgers" ]]; then
     current_branch=$(git -C "$project_dir" branch --show-current 2>/dev/null || true)
     if [[ "$current_branch" =~ TASK-([0-9]+) ]]; then

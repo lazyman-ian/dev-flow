@@ -2,13 +2,16 @@
 # dev-workflow-hooks.sh - Automate dev workflow actions
 # Triggered by PostToolUse(Bash) to detect git/gh commands
 
-set -euo pipefail
+# Relaxed strict mode: -e can cause issues with git commands in non-git dirs
+set -o pipefail
 
 INPUT=$(cat)
-TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // ""')
-COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
-EXIT_CODE=$(echo "$INPUT" | jq -r '.tool_response.exitCode // 0')
-OUTPUT=$(echo "$INPUT" | jq -r '.tool_response.output // ""')
+
+# Safe JSON parsing with fallbacks
+TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // ""' 2>/dev/null || echo "")
+COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""' 2>/dev/null || echo "")
+EXIT_CODE=$(echo "$INPUT" | jq -r '.tool_response.exitCode // 0' 2>/dev/null || echo "0")
+OUTPUT=$(echo "$INPUT" | jq -r '.tool_response.output // ""' 2>/dev/null || echo "")
 
 # Only process successful Bash commands
 if [[ "$TOOL_NAME" != "Bash" ]] || [[ "$EXIT_CODE" != "0" ]]; then
@@ -16,7 +19,11 @@ if [[ "$TOOL_NAME" != "Bash" ]] || [[ "$EXIT_CODE" != "0" ]]; then
     exit 0
 fi
 
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+# Safe project dir detection
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-}"
+if [[ -z "$PROJECT_DIR" ]]; then
+    PROJECT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) || PROJECT_DIR=$(pwd)
+fi
 PLUGIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # Cascading lookup: plugin scripts first, then user's global scripts
 if [[ -d "$PLUGIN_DIR/scripts" ]]; then
@@ -42,12 +49,15 @@ get_task() {
 has_ledger() {
     local branch=$(get_branch)
     local task=$(get_task "$branch")
-    if [[ -n "$task" ]]; then
-        local ledger=$(find "$PROJECT_DIR/thoughts/ledgers" -maxdepth 1 -name "${task}-*.md" 2>/dev/null | head -1)
-        [[ -n "$ledger" ]]
-    else
+    local ledger_dir="$PROJECT_DIR/thoughts/ledgers"
+
+    # Early exit if no task or ledger dir doesn't exist
+    if [[ -z "$task" ]] || [[ ! -d "$ledger_dir" ]]; then
         return 1
     fi
+
+    local ledger=$(find "$ledger_dir" -maxdepth 1 -name "${task}-*.md" 2>/dev/null | head -1)
+    [[ -n "$ledger" ]]
 }
 
 CONTEXT=""

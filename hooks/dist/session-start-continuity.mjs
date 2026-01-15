@@ -117,7 +117,7 @@ async function main() {
           startupMsg += ` | Last handoff: task-${latestHandoff.taskNumber} (${latestHandoff.status})`;
         }
       }
-      startupMsg += " (run /resume_handoff to continue)";
+      startupMsg += " (run /dev ledger to continue)";
       message = startupMsg;
     } else {
       console.error(`\u2713 Ledger loaded: ${sessionName} \u2192 ${currentFocus}`);
@@ -188,8 +188,8 @@ All handoffs in ${handoffDir}:
     }
   } else {
     if (sessionType !== "startup") {
-      console.error(`\u26A0 No ledger found. Run /continuity_ledger to track session state.`);
-      message = `[${sessionType}] No ledger found. Consider running /continuity_ledger to track session state.`;
+      console.error(`\u26A0 No ledger found. Run /dev ledger to track session state.`);
+      message = `[${sessionType}] No ledger found. Consider running /dev ledger to track session state.`;
     }
   }
   const output = { result: "continue" };

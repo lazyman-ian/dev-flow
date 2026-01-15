@@ -201,7 +201,7 @@ async function main() {
   if (ledgerFiles.length === 0) {
     const output = {
       continue: true,
-      systemMessage: "[PreCompact] No ledger found. Create one? /continuity_ledger"
+      systemMessage: "[PreCompact] No ledger found. Create one? /dev ledger"
     };
     console.log(JSON.stringify(output));
     return;
@@ -243,7 +243,7 @@ async function main() {
   } else {
     const output = {
       continue: true,
-      systemMessage: `[PreCompact] Consider updating ledger before compacting: /continuity_ledger
+      systemMessage: `[PreCompact] Consider updating ledger before compacting: /dev ledger
 Ledger: ${mostRecent}`
     };
     console.log(JSON.stringify(output));
