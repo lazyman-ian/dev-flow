@@ -18,8 +18,9 @@ Analyze Claude Code session performance and iterate on prompts for continuous im
 
 | Command | Purpose |
 |---------|---------|
-| `/meta-iterate` | Run full 5-phase workflow |
+| `/meta-iterate` | Run full workflow |
 | `/meta-iterate evaluate` | Evaluate recent sessions |
+| `/meta-iterate discover` | Find new skill opportunities |
 | `/meta-iterate diagnose` | Diagnose identified issues |
 | `/meta-iterate propose` | Generate improvement proposals |
 | `/meta-iterate apply` | Apply approved changes |
@@ -47,6 +48,7 @@ Phase 4 (apply) requires explicit user approval before modifying any files.
 | Phase | Output |
 |-------|--------|
 | Evaluate | `thoughts/evaluations/EVAL-YYYY-MM-DD.json` |
+| Discover | `thoughts/discoveries/DISCOVER-YYYY-MM-DD.md` |
 | Diagnose | `thoughts/diagnoses/DIAG-YYYY-MM-DD.md` |
 | Propose | `thoughts/proposals/PROP-YYYY-MM-DD.md` |
 | Apply | `thoughts/iterations/ITER-NNN.md` |
@@ -56,6 +58,9 @@ Phase 4 (apply) requires explicit user approval before modifying any files.
 ```bash
 # Weekly check
 /meta-iterate
+
+# Find new skill opportunities
+/meta-iterate discover
 
 # Focus on specific component
 /meta-iterate --target agents/plan-agent.md

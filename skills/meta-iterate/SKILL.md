@@ -23,49 +23,28 @@ Analyze Claude Code session performance and iterate on agent/skill/rule prompts 
 |---------|---------|
 | `/meta-iterate` | Run full 5-phase workflow |
 | `/meta-iterate evaluate` | Only evaluate sessions |
+| `/meta-iterate discover` | Discover new skill opportunities |
 | `/meta-iterate diagnose` | Only diagnose issues |
 | `/meta-iterate propose` | Only generate proposals |
 | `/meta-iterate apply` | Apply approved changes |
 | `/meta-iterate verify` | Verify improvement effects |
 
-## 5-Phase Workflow
+## Workflow
 
 ```
-┌─────────────────────────────────────────────────┐
-│ Phase 1: EVALUATE                               │
-│ Input: Braintrust session logs                  │
-│ Output: thoughts/evaluations/EVAL-<date>.json   │
-│ Agent: evaluate-agent                           │
-└─────────────────────┬───────────────────────────┘
-                      ↓
-┌─────────────────────────────────────────────────┐
-│ Phase 2: DIAGNOSE                               │
-│ Input: Evaluation results                       │
-│ Output: thoughts/diagnoses/DIAG-<date>.md       │
-│ Agent: diagnose-agent                           │
-└─────────────────────┬───────────────────────────┘
-                      ↓
-┌─────────────────────────────────────────────────┐
-│ Phase 3: PROPOSE                                │
-│ Input: Diagnosis report                         │
-│ Output: thoughts/proposals/PROP-<date>.md       │
-│ Agent: propose-agent                            │
-└─────────────────────┬───────────────────────────┘
-                      ↓
-┌─────────────────────────────────────────────────┐
-│ Phase 4: APPLY (requires approval)              │
-│ Input: Proposals + user approval                │
-│ Output: Updated component files                 │
-│ Agent: apply-agent                              │
-└─────────────────────┬───────────────────────────┘
-                      ↓
-┌─────────────────────────────────────────────────┐
-│ Phase 5: VERIFY (after new sessions)            │
-│ Input: Post-change sessions                     │
-│ Output: Verification report                     │
-│ Agent: verify-agent                             │
-└─────────────────────────────────────────────────┘
+evaluate → discover (optional) → diagnose → propose → [approve] → apply → verify
 ```
+
+| Phase | Input | Output | Agent |
+|-------|-------|--------|-------|
+| **evaluate** | Braintrust logs | `EVAL-<date>.json` | evaluate-agent |
+| **discover** | Evaluation data | `DISCOVER-<date>.md` | (built-in) |
+| **diagnose** | Evaluation | `DIAG-<date>.md` | diagnose-agent |
+| **propose** | Diagnosis | `PROP-<date>.md` | propose-agent |
+| **apply** | Proposals + approval | Component files | apply-agent |
+| **verify** | Post-change sessions | `ITER-NNN.md` | verify-agent |
+
+**discover** analyzes tool usage patterns to suggest new skills (merged from `/discover-skills`).
 
 ## Options
 
@@ -79,23 +58,23 @@ Analyze Claude Code session performance and iterate on agent/skill/rule prompts 
 ## Examples
 
 ```bash
-# Full evaluation and improvement workflow
+# Full workflow
 /meta-iterate
 
 # Evaluate recent 20 sessions
 /meta-iterate evaluate --recent 20
 
+# Discover new skill opportunities (merged from /discover-skills)
+/meta-iterate discover
+
 # Focus on specific agent
 /meta-iterate --target agents/plan-agent.md
-
-# Only evaluate skills
-/meta-iterate --type skill
 
 # Apply specific proposals
 /meta-iterate apply --proposals PROP-2026-01-10.md
 
-# Verify after improvements applied
-/meta-iterate verify --iteration ITER-001
+# Verify after improvements
+/meta-iterate verify
 ```
 
 ## Output Files
@@ -103,6 +82,7 @@ Analyze Claude Code session performance and iterate on agent/skill/rule prompts 
 | Phase | Location | Format |
 |-------|----------|--------|
 | Evaluate | `thoughts/evaluations/EVAL-YYYY-MM-DD.json` | JSON |
+| Discover | `thoughts/discoveries/DISCOVER-YYYY-MM-DD.md` | Markdown |
 | Diagnose | `thoughts/diagnoses/DIAG-YYYY-MM-DD.md` | Markdown |
 | Propose | `thoughts/proposals/PROP-YYYY-MM-DD.md` | Markdown |
 | Apply | Component files + `thoughts/iterations/ITER-NNN.md` | Markdown |
@@ -129,8 +109,11 @@ This ensures human oversight on all prompt changes.
 ## Quick Reference
 
 ```bash
-# Periodic check (recommended weekly)
+# Weekly check (full workflow)
 /meta-iterate
+
+# Find new skill opportunities
+/meta-iterate discover
 
 # After noticing issues
 /meta-iterate evaluate --recent 5
