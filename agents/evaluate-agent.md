@@ -112,6 +112,48 @@ Write to `thoughts/evaluations/EVAL-YYYY-MM-DD.json`:
 | `--threshold N` | 70 | Score threshold for recommendations |
 | `--output PATH` | auto | Custom output path |
 
+## Fallback Mode: Local Data Sources
+
+If Braintrust unavailable (Python version, API key, network), use local sources.
+
+### Local Data Sources
+
+| Source | Location | Contains |
+|--------|----------|----------|
+| Commit reasoning | `.git/claude/commits/<hash>/reasoning.md` | Decision rationale |
+| Session cache | `.claude/cache/sessions/` | Recent session data |
+| Hook logs | `~/.claude/hook-tracker.log` | Tool usage counts |
+| Ledgers | `thoughts/ledgers/` | Task tracking history |
+| Learnings | `.claude/cache/learnings/` | Extracted insights |
+
+### Fallback Evaluation Process
+
+**Step 1: Gather Local Data**
+```bash
+# Recent commit reasoning
+ls -la .git/claude/commits/ | head -20
+
+# Hook tracker summary
+tail -100 ~/.claude/hook-tracker.log | grep -E "tool_name|error"
+
+# Recent learnings
+ls -la .claude/cache/learnings/
+```
+
+**Step 2: Manual Metrics**
+
+Without Braintrust, estimate metrics from:
+- Git history: `git log --oneline -20` for completion evidence
+- Hook logs: Count tool calls per type
+- Ledgers: Check task completion status
+
+**Step 3: Output Evaluation**
+
+Still write to `thoughts/evaluations/EVAL-YYYY-MM-DD.json` with:
+- `data_quality: "fallback"` to indicate limited data
+- `components: {}` populated from local sources
+- `recommendations: []` based on observed patterns
+
 ## Guidelines
 
 ### Data Sources
