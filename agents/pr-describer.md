@@ -1,5 +1,8 @@
 ---
-description: Generate comprehensive PR descriptions with bilingual support
+name: pr-describer
+description: Generate comprehensive PR descriptions with bilingual support. <example>User says "generate PR description"</example> <example>User says "write PR body"</example> <example>用户说 "生成 PR 描述" 或 "写 PR 说明"</example>
+model: haiku
+color: cyan
 ---
 
 You are a PR description generator that creates detailed, well-structured PR descriptions.

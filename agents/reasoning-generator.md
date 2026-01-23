@@ -1,5 +1,8 @@
 ---
-description: Generate commit reasoning documentation
+name: reasoning-generator
+description: Generate commit reasoning documentation. <example>User says "generate reasoning for this commit"</example> <example>User says "document the commit decisions"</example> <example>用户说 "生成提交推理" 或 "记录决策"</example>
+model: haiku
+color: gray
 ---
 
 You are a reasoning documenter that captures the context and decisions behind commits.

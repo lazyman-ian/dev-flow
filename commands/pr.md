@@ -13,7 +13,7 @@ description: Create PR with auto-push, auto-description, auto-review
 ```bash
 git status --short           # 检查未提交
 git log origin/master..HEAD  # 检查未推送
-gh pr view 2>/dev-flow/null       # 检查已有 PR
+gh pr view 2>/dev/null            # 检查已有 PR
 ```
 
 | 状态 | 处理 |
