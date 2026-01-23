@@ -1,8 +1,8 @@
 ---
 name: create-plan
-description: Create detailed implementation plans through interactive research. Use when user wants to plan a feature, design architecture, or prepare implementation strategy. Triggers on "create plan", "implementation plan", "设计方案", "制定计划", "plan feature".
+description: Creates detailed implementation plans through interactive research. This skill should be used when user says "create plan", "make a plan", "design architecture", "plan feature", "制定计划", "设计方案", "规划功能", "架构设计". Triggers on /create_plan, 实现计划, 功能规划, 技术方案.
 model: opus
-allowed-tools: [Read, Glob, Grep, WebSearch, Task, TodoWrite]
+allowed-tools: [Read, Glob, Grep, WebSearch, Task, TaskCreate, TaskUpdate]
 ---
 
 # Implementation Plan

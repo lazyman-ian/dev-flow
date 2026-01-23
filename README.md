@@ -1,4 +1,4 @@
-# dev-flow Plugin v3.7
+# dev-flow Plugin v3.11
 
 统一的开发工作流: planning → coding → commit → PR → release
 
@@ -9,6 +9,7 @@
 - **完整工作流**: 从计划到发布的全流程自动化
 - **智能自动化**: 自动推断 scope、生成 commit message、PR 描述
 - **状态持久化**: Ledger 跨 session 保持、Reasoning 记录决策历史
+- **Task Management**: 与 Claude Code Task Management 双向同步
 - **质量保障**: 自动执行平台对应的 lint/format 命令
 - **多平台支持**: iOS、Android 内置，可扩展至 Python、Go、Rust、Node 等
 - **自我迭代**: `/dev-flow:meta-iterate` 分析 session 表现，持续优化 agent/skill prompt
@@ -57,6 +58,7 @@
 | 命令 | 功能 |
 |------|------|
 | `/dev-flow:ledger` | 状态账本管理 |
+| `/dev-flow:tasks` | Task Management 同步 |
 | `/dev-flow:recall` | 搜索历史决策 |
 | `/dev-flow:describe` | 详细 PR 描述 |
 | `/dev-flow:tokens` | Token 使用分析 |
@@ -70,10 +72,13 @@
 |------|------|
 | `/dev-flow:meta-iterate` | 完整 5 阶段迭代流程 |
 | `/dev-flow:meta-iterate evaluate` | 评估 session 表现 |
+| `/dev-flow:meta-iterate discover` | 发现新 skill 机会 |
 | `/dev-flow:meta-iterate diagnose` | 诊断问题根因 |
 | `/dev-flow:meta-iterate propose` | 生成改进提案 |
 | `/dev-flow:meta-iterate apply` | 应用改进 (需人工审核) |
 | `/dev-flow:meta-iterate verify` | 验证改进效果 |
+
+**本地模式**: Braintrust 不可用时自动使用本地 JSONL 文件进行评估。
 
 ## 工作流
 
@@ -221,7 +226,11 @@
 | `dev_status` | ~30 | 快速状态 |
 | `dev_flow` | ~100 | 详细状态 |
 | `dev_check` | ~10 | CI 就绪检查 |
+| `dev_fix` | ~20 | 获取修复命令 |
 | `dev_next` | ~15 | 下一步建议 |
+| `dev_changes` | ~50 | 变更分析 |
+| `dev_config` | ~50 | 平台配置 |
+| `dev_ready` | ~20 | PR 状态控制 |
 | `dev_ledger` | ~50 | Ledger 管理 |
 | `dev_reasoning` | ~30 | Reasoning 管理 |
 | `dev_branch` | ~30 | 分支生命周期 |
@@ -377,14 +386,23 @@ dev-flow-plugin/
 ├── .claude-plugin/plugin.json
 ├── .mcp.json
 ├── mcp-server/              # MCP 服务器
-├── skills/                  # 6 个 skills
-│   ├── dev/
+├── skills/                  # 5 个 skills (Reference File Architecture)
+│   ├── config-optimize/
+│   │   ├── SKILL.md
+│   │   └── references/      # 详细文档
 │   ├── create_plan/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── dev/
+│   │   ├── SKILL.md
+│   │   └── references/      # mcp-tools.md
 │   ├── implement_plan/
-│   ├── implement_task/
-│   ├── validate-agent/
+│   │   ├── SKILL.md
+│   │   └── references/
 │   └── meta-iterate/
-├── commands/                # 15 个命令
+│       ├── SKILL.md
+│       └── references/
+├── commands/                # 18 个命令
 ├── agents/                  # 12 个 agents
 │   ├── plan-agent.md
 │   ├── implement-agent.md

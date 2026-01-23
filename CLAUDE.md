@@ -24,10 +24,10 @@ npm run dev       # Run with ts-node
 ### Plugin Structure
 
 ```
-.claude-plugin/plugin.json  # Plugin manifest (v3.8.0)
+.claude-plugin/plugin.json  # Plugin manifest (v3.10.0)
 .mcp.json                   # MCP server config → scripts/mcp-server.cjs
-skills/                     # 7 skills (SKILL.md + references/)
-commands/                   # 20 command definitions
+skills/                     # 5 skills (SKILL.md + references/)
+commands/                   # 18 command definitions
 agents/                     # 12 agent prompts
 hooks/hooks.json            # 3 hooks (SessionStart, PreCompact, PostToolUse)
 templates/thoughts/schema/  # JSON schemas for meta-iterate outputs
@@ -39,14 +39,14 @@ Single-file bundle architecture using `@modelcontextprotocol/sdk`:
 
 | Module | Purpose |
 |--------|---------|
-| `index.ts` | Server entry, 14 MCP tools |
+| `index.ts` | Server entry, 15 MCP tools |
 | `detector.ts` | Project type detection (ios/android/web) |
 | `git/workflow.ts` | Git status, phase detection |
 | `git/build-control.ts` | PR draft/ready, change analysis |
 | `git/version.ts` | Version info, release notes |
 | `platforms/ios.ts` | SwiftLint, SwiftFormat integration |
 | `platforms/android.ts` | ktlint, ktfmt integration |
-| `continuity/` | Ledgers, reasoning, branch management |
+| `continuity/` | Ledgers, reasoning, branch, task-sync |
 
 ### Platform Extension
 
@@ -83,6 +83,7 @@ export function getPythonCommands(): PlatformCommands {
 | `dev_flow` | ~100 | Full status table |
 | `dev_config` | ~50 | Platform commands (auto-detected, no Makefile needed) |
 | `dev_ledger` | ~50 | Task continuity management |
+| `dev_tasks` | ~30 | Sync ledger with Task Management |
 | `dev_defaults` | ~20 | Auto-infer scope from changes |
 
 ### Workflow Phases
@@ -116,6 +117,7 @@ allowed-tools: [specific, tools, only]
 
 - **Ledgers**: `thoughts/ledgers/CONTINUITY_CLAUDE-*.md` - Track task state across sessions
 - **Reasoning**: `.git/claude/commits/<hash>/reasoning.md` - Document commit decisions
+- **Task Sync**: Bridge ledger state with Claude Code Task Management tools
 - Both stored in git for persistence
 
 ### Hook Integration

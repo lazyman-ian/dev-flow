@@ -54,10 +54,10 @@ Task(model="opus", ...)    # 复杂架构决策
 mkdir -p thoughts/handoffs/<session-name>
 ```
 
-### 2. Read Implementation Agent Skill
+### 2. Read Task Executor Reference
 
 ```bash
-cat .claude/skills/implement_task/SKILL.md
+# See references/task-executor.md for TDD workflow
 ```
 
 ---

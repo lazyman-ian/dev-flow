@@ -1,9 +1,9 @@
 ---
 name: implement-plan
-description: Execute implementation plans with TDD and agent orchestration. Use when user says "implement plan", "execute plan", "follow the plan", "按计划实现", "执行方案". Supports direct implementation and compaction-resistant agent mode.
+description: Executes implementation plans with TDD and agent orchestration. This skill should be used when user says "implement plan", "execute plan", "follow the plan", "start implementation", "按计划实现", "执行方案", "开始实现", "实现功能". Triggers on /implement_plan, 执行计划, 代码实现, TDD开发.
 model: opus
 context: fork
-allowed-tools: [Read, Glob, Grep, Edit, Write, Bash, Task, TodoWrite]
+allowed-tools: [Read, Glob, Grep, Edit, Write, Bash, Task, TaskCreate, TaskUpdate, TaskList, TaskGet]
 ---
 
 # Implement Plan
@@ -27,14 +27,16 @@ Execute approved technical plans from `thoughts/shared/plans/`.
 
 1. Read plan completely (check existing `[x]` marks)
 2. Read original ticket + all mentioned files (FULLY)
-3. Create todo list for progress tracking
-4. Start implementing
+3. Create tasks with `TaskCreate` for each phase (set dependencies)
+4. Start implementing (update task status as you go)
 
 ## Reference Menu
 
 | Reference | Load When |
 |-----------|-----------|
+| `references/task-management.md` | Task creation/tracking patterns |
 | `references/agent-orchestration.md` | Using agent mode (4+ tasks) |
+| `references/task-executor.md` | Single task TDD workflow |
 
 ## Direct Implementation
 
@@ -73,7 +75,7 @@ Then follow `references/agent-orchestration.md`.
 
 ```bash
 mkdir -p thoughts/handoffs/<session-name>
-cat .claude/skills/implement_task/SKILL.md
+# See references/task-executor.md for TDD workflow
 ```
 
 ## Resuming Work

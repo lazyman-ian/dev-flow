@@ -7,3 +7,4 @@ export * from './ledger';
 export * from './reasoning';
 export * from './branch';
 export * from './defaults';
+export * from './task-sync';

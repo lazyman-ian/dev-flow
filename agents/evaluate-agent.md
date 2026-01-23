@@ -14,6 +14,25 @@ Evaluate session quality and identify improvement targets:
 
 ## Process
 
+### 0. Pre-flight Infrastructure Check
+
+Before running Braintrust analysis, verify environment:
+
+```bash
+# Check if braintrust_analyze.py dependencies are available
+uv run python -c "import requests; print('OK')" 2>/dev/null || echo "FALLBACK_REQUIRED"
+```
+
+If output is `FALLBACK_REQUIRED`:
+1. Skip to "Fallback Mode: Local Data Sources" section
+2. Use local session JSONL files instead
+3. Mark evaluation with `data_quality: "local"`
+
+**Do NOT attempt** `uv run python braintrust_analyze.py` if pre-flight fails.
+This avoids wasting tokens on error messages.
+
+---
+
 ### 1. Gather Session Data
 
 Query Braintrust for recent sessions:
@@ -125,29 +144,84 @@ If Braintrust unavailable (Python version, API key, network), use local sources.
 | Hook logs | `~/.claude/hook-tracker.log` | Tool usage counts |
 | Ledgers | `thoughts/ledgers/` | Task tracking history |
 | Learnings | `.claude/cache/learnings/` | Extracted insights |
+| **Session JSONL** | `~/.claude/projects/<project>/*.jsonl` | Full session transcripts |
+| Session index | `~/.claude/projects/<project>/session-index` | Session metadata |
+| Stats cache | `~/.claude/projects/<project>/stats-cache` | Token usage stats |
 
 ### Fallback Evaluation Process
 
-**Step 1: Gather Local Data**
+**Step 1: Find Session Files**
+
 ```bash
-# Recent commit reasoning
-ls -la .git/claude/commits/ | head -20
+# List all projects with session data
+ls ~/.claude/projects/
 
-# Hook tracker summary
-tail -100 ~/.claude/hook-tracker.log | grep -E "tool_name|error"
-
-# Recent learnings
-ls -la .claude/cache/learnings/
+# Find most recent session files for current project
+PROJECT_HASH=$(ls -t ~/.claude/projects/ | head -1)
+ls -lt ~/.claude/projects/$PROJECT_HASH/*.jsonl 2>/dev/null | head -10
 ```
 
-**Step 2: Manual Metrics**
+**Step 2: Parse Session JSONL**
+
+Each `.jsonl` file contains one JSON object per line. Key event types:
+
+| Event Type | Field | Contains |
+|------------|-------|----------|
+| `user` | `.message.content` | User prompts |
+| `assistant` | `.message.content` | Claude responses |
+| `tool_use` | `.name`, `.input` | Tool calls |
+| `tool_result` | `.content` | Tool outputs |
+
+**Extract tool usage counts:**
+```bash
+# Count tool calls per type (requires jq)
+cat <session>.jsonl | jq -r 'select(.type=="tool_use") | .name' 2>/dev/null | sort | uniq -c | sort -rn
+```
+
+**Extract user messages:**
+```bash
+# Get first 100 chars of each user message
+cat <session>.jsonl | jq -r 'select(.type=="user") | .message.content[:100]' 2>/dev/null
+```
+
+**Extract errors/retries:**
+```bash
+# Find error patterns
+cat <session>.jsonl | jq -r 'select(.type=="tool_result") | select(.is_error==true) | .content[:200]' 2>/dev/null
+```
+
+**Step 3: Parse Session Index (Metadata)**
+
+```bash
+# Get session metadata (timestamps, duration)
+cat ~/.claude/projects/$PROJECT_HASH/session-index | jq -r '.sessions[-5:]'
+```
+
+**Step 4: Parse Stats Cache (Token Usage)**
+
+```bash
+# Get token usage per session
+cat ~/.claude/projects/$PROJECT_HASH/stats-cache | jq -r '.sessions | to_entries[-5:]'
+```
+
+**Step 5: Gather Commit Reasoning**
+
+```bash
+# List recent commit reasoning files
+ls -lt .git/claude/commits/*/reasoning.md 2>/dev/null | head -10
+
+# Read a reasoning file
+cat .git/claude/commits/<hash>/reasoning.md
+```
+
+**Step 6: Manual Metrics**
 
 Without Braintrust, estimate metrics from:
 - Git history: `git log --oneline -20` for completion evidence
 - Hook logs: Count tool calls per type
 - Ledgers: Check task completion status
 
-**Step 3: Output Evaluation**
+**Step 7: Output Evaluation**
 
 Still write to `thoughts/evaluations/EVAL-YYYY-MM-DD.json` with:
 - `data_quality: "fallback"` to indicate limited data

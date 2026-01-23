@@ -1,32 +1,49 @@
 {
   "hooks": {
-    "SessionStart": [
+    "Setup": [
       {
+        "matcher": "init",
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start-continuity.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/setup-dev-flow.sh",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start-continuity.sh",
+            "timeout": 10
           }
         ]
       }
     ],
     "PreCompact": [
       {
+        "matcher": "auto|manual",
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-compact.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-compact.sh",
+            "timeout": 10
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash(git *)|Bash(gh *)",
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/dev-workflow.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/dev-workflow.sh",
+            "timeout": 10
           }
         ]
       }

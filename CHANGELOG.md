@@ -4,6 +4,37 @@ All notable changes to dev-flow-plugin will be documented in this file.
 
 Author: lazyman
 
+## [3.11.0] - 2026-01-24
+
+### Added
+- `skills/dev/references/mcp-tools.md` - Complete MCP tools reference (170 lines)
+- Added 4 missing tools to README MCP table: `dev_fix`, `dev_changes`, `dev_config`, `dev_ready`
+
+### Changed
+- **dev skill**: Adopted Reference File Architecture pattern
+- Simplified MCP Tools table in `skills/dev/SKILL.md` (moved details to references/)
+- Updated README.md MCP tools table (10 → 14 tools)
+
+### Documentation
+- Updated plugin version to 3.11.0
+
+## [3.10.0] - 2026-01-23
+
+### Added
+- **Task Management Integration**: Bridge Continuity Ledger with Claude Code Task Management
+- `dev_tasks` MCP tool with summary/export/sync actions
+- `/dev-flow:tasks` command for task synchronization
+- `continuity/task-sync.ts` module for bidirectional sync
+- Task management best practices in `references/task-management.md`
+
+### Changed
+- Updated 5 skills with Task Management allowed-tools (TaskCreate, TaskUpdate, TaskList, TaskGet)
+- Replaced TodoWrite with native Task Management tools
+- Updated CLAUDE.md with new tool documentation
+
+### Skills Updated
+- implement_plan, create_plan, meta-iterate, config-optimize, implement_task
+
 ## [3.7.1] - 2026-01-12
 
 ### Fixed

@@ -202,6 +202,21 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         },
       },
     },
+    {
+      name: 'dev_tasks',
+      description: '[~30 tokens] Sync ledger state with Claude Code Task Management',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          action: {
+            type: 'string',
+            enum: ['summary', 'export', 'sync'],
+            description: 'summary=quick status, export=JSON for TaskCreate, sync=update ledger from tasks',
+          },
+          ledgerPath: { type: 'string', description: 'Override ledger path (default: active ledger)' },
+        },
+      },
+    },
   ],
 }));
 
@@ -346,6 +361,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return branchTool(args?.action as string, args?.target as string, args?.days as number, args?.dryRun as boolean);
       case 'dev_defaults':
         return defaultsTool(args?.action as string);
+      case 'dev_tasks':
+        return tasksTool(args?.action as string, args?.ledgerPath as string);
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
@@ -876,6 +893,33 @@ function defaultsTool(action?: string) {
       return { content: [{ type: 'text', text: all.message }] };
     default:
       return { content: [{ type: 'text', text: '❌ Action required: scope|labels|reviewers|working-set|all' }] };
+  }
+}
+
+function tasksTool(action?: string, ledgerPath?: string) {
+  // Get ledger path - use provided or find active
+  const path = ledgerPath || continuity.getActiveLedgerPath?.() || '';
+  if (!path) {
+    return { content: [{ type: 'text', text: 'NO_LEDGER|Create with dev_ledger(action:"create")' }] };
+  }
+
+  switch (action) {
+    case 'summary':
+      return { content: [{ type: 'text', text: continuity.getTaskSyncSummary(path) }] };
+    case 'export':
+      const exported = continuity.exportLedgerAsJson(path);
+      if (!exported) {
+        return { content: [{ type: 'text', text: '❌ Failed to export ledger' }] };
+      }
+      // Generate TaskCreate commands
+      const commands = continuity.generateTaskCommands(exported.tasks);
+      return { content: [{ type: 'text', text: commands || 'NO_TASKS|All completed or empty' }] };
+    case 'sync':
+      // Return markdown table of current state
+      const tasks = continuity.parseLedgerState(path);
+      return { content: [{ type: 'text', text: continuity.formatTasksAsMarkdown(tasks) }] };
+    default:
+      return { content: [{ type: 'text', text: '❌ Action required: summary|export|sync' }] };
   }
 }
 

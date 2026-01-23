@@ -21488,6 +21488,10 @@ function parseLedger(path4) {
     prUrl
   };
 }
+function getActiveLedgerPath() {
+  const ledger = findActiveLedger();
+  return ledger?.path || null;
+}
 function ledgerStatus() {
   const ledger = findActiveLedger();
   if (!ledger) {
@@ -22241,6 +22245,118 @@ function inferAll() {
   };
 }
 
+// src/continuity/task-sync.ts
+var import_fs4 = require("fs");
+function parseLedgerState(ledgerPath) {
+  if (!(0, import_fs4.existsSync)(ledgerPath)) return [];
+  const content = (0, import_fs4.readFileSync)(ledgerPath, "utf-8");
+  const tasks = [];
+  const stateMatch = content.match(/## State\s*\n([\s\S]*?)(?=\n## |$)/m);
+  if (!stateMatch) return [];
+  const stateContent = stateMatch[1];
+  let currentSection = null;
+  let taskIndex = 0;
+  for (const line of stateContent.split("\n")) {
+    if (line.match(/^\s*-?\s*Done:/i)) {
+      currentSection = "done";
+      continue;
+    }
+    if (line.match(/^\s*-?\s*Now:/i)) {
+      currentSection = "now";
+      continue;
+    }
+    if (line.match(/^\s*-?\s*Next:/i)) {
+      currentSection = "next";
+      continue;
+    }
+    const checkboxMatch = line.match(/^\s*-?\s*\[(x|→| )\]\s*(.+)$/i);
+    if (checkboxMatch && currentSection) {
+      const [, marker, subject] = checkboxMatch;
+      taskIndex++;
+      let status;
+      if (marker.toLowerCase() === "x") {
+        status = "completed";
+      } else if (marker === "\u2192") {
+        status = "in_progress";
+      } else {
+        status = "pending";
+      }
+      tasks.push({
+        id: `task-${taskIndex}`,
+        subject: subject.trim(),
+        status
+      });
+    }
+  }
+  for (let i = 1; i < tasks.length; i++) {
+    if (tasks[i].status === "pending") {
+      for (let j = i - 1; j >= 0; j--) {
+        if (tasks[j].status !== "completed") {
+          tasks[i].blockedBy = [tasks[j].id];
+          break;
+        }
+      }
+    }
+  }
+  return tasks;
+}
+function generateTaskCommands(tasks) {
+  const commands = [];
+  for (const task of tasks) {
+    if (task.status === "completed") continue;
+    commands.push(`TaskCreate({
+  subject: "${task.subject}",
+  description: "From ledger state",
+  activeForm: "${task.status === "in_progress" ? task.subject : "Waiting to start"}"
+});`);
+  }
+  for (const task of tasks) {
+    if (task.blockedBy && task.blockedBy.length > 0) {
+      commands.push(`TaskUpdate({ taskId: "${task.id}", addBlockedBy: ${JSON.stringify(task.blockedBy)} });`);
+    }
+  }
+  return commands.join("\n\n");
+}
+function formatTasksAsMarkdown(tasks) {
+  if (tasks.length === 0) return "No tasks defined.";
+  const statusEmoji = {
+    completed: "\u2705",
+    in_progress: "\u2192",
+    pending: "\u23F3"
+  };
+  const lines = [
+    "| ID | Subject | Status | Blocked By |",
+    "|----|---------|--------|------------|"
+  ];
+  for (const task of tasks) {
+    const blocked = task.blockedBy?.join(", ") || "-";
+    lines.push(`| ${task.id} | ${task.subject} | ${statusEmoji[task.status]} ${task.status} | ${blocked} |`);
+  }
+  return lines.join("\n");
+}
+function getTaskSyncSummary(ledgerPath) {
+  const tasks = parseLedgerState(ledgerPath);
+  if (tasks.length === 0) {
+    return "NO_TASKS|0 total";
+  }
+  const completed = tasks.filter((t) => t.status === "completed").length;
+  const inProgress = tasks.filter((t) => t.status === "in_progress").length;
+  const pending = tasks.filter((t) => t.status === "pending").length;
+  return `TASKS|${tasks.length} total|${completed} done|${inProgress} active|${pending} pending`;
+}
+function exportLedgerAsJson(ledgerPath) {
+  if (!(0, import_fs4.existsSync)(ledgerPath)) return null;
+  const content = (0, import_fs4.readFileSync)(ledgerPath, "utf-8");
+  const taskIdMatch = ledgerPath.match(/TASK-\d+/);
+  const taskId = taskIdMatch ? taskIdMatch[0] : "unknown";
+  return {
+    ledgerPath,
+    taskId,
+    tasks: parseLedgerState(ledgerPath),
+    lastSync: (/* @__PURE__ */ new Date()).toISOString()
+  };
+}
+
 // src/index.ts
 var server = new Server(
   { name: "dev-flow-mcp", version: "2.1.0" },
@@ -22422,6 +22538,21 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           }
         }
       }
+    },
+    {
+      name: "dev_tasks",
+      description: "[~30 tokens] Sync ledger state with Claude Code Task Management",
+      inputSchema: {
+        type: "object",
+        properties: {
+          action: {
+            type: "string",
+            enum: ["summary", "export", "sync"],
+            description: "summary=quick status, export=JSON for TaskCreate, sync=update ledger from tasks"
+          },
+          ledgerPath: { type: "string", description: "Override ledger path (default: active ledger)" }
+        }
+      }
     }
   ]
 }));
@@ -22555,6 +22686,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return branchTool(args?.action, args?.target, args?.days, args?.dryRun);
       case "dev_defaults":
         return defaultsTool(args?.action);
+      case "dev_tasks":
+        return tasksTool(args?.action, args?.ledgerPath);
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
@@ -22993,6 +23126,28 @@ function defaultsTool(action) {
       return { content: [{ type: "text", text: all.message }] };
     default:
       return { content: [{ type: "text", text: "\u274C Action required: scope|labels|reviewers|working-set|all" }] };
+  }
+}
+function tasksTool(action, ledgerPath) {
+  const path4 = ledgerPath || getActiveLedgerPath?.() || "";
+  if (!path4) {
+    return { content: [{ type: "text", text: 'NO_LEDGER|Create with dev_ledger(action:"create")' }] };
+  }
+  switch (action) {
+    case "summary":
+      return { content: [{ type: "text", text: getTaskSyncSummary(path4) }] };
+    case "export":
+      const exported = exportLedgerAsJson(path4);
+      if (!exported) {
+        return { content: [{ type: "text", text: "\u274C Failed to export ledger" }] };
+      }
+      const commands = generateTaskCommands(exported.tasks);
+      return { content: [{ type: "text", text: commands || "NO_TASKS|All completed or empty" }] };
+    case "sync":
+      const tasks = parseLedgerState(path4);
+      return { content: [{ type: "text", text: formatTasksAsMarkdown(tasks) }] };
+    default:
+      return { content: [{ type: "text", text: "\u274C Action required: summary|export|sync" }] };
   }
 }
 async function main() {

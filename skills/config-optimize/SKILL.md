@@ -1,8 +1,8 @@
 ---
 name: config-optimize
-description: Check Claude Code releases and optimize configuration for new features. Use when user says "optimize config", "check updates", "new features", "what's new", "配置优化", "检查更新", "新功能". Runs periodically or after Claude Code updates.
+description: Checks Claude Code releases and optimizes Claude Code configuration for new features. Use when user explicitly says "/config-optimize", "check claude updates", "optimize claude settings", "claude new features", "Claude配置优化", "检查Claude更新", "Claude新功能". NOT for general "optimize" requests, documentation reading, or when user references files with "optimization" in the name.
 model: haiku
-allowed-tools: [Read, Glob, Grep, Write, Edit, Bash, WebFetch, TodoWrite]
+allowed-tools: [Read, Glob, Grep, Write, Edit, Bash, WebFetch, TaskCreate, TaskUpdate]
 ---
 
 # config-optimize
@@ -23,6 +23,27 @@ Automatically check Claude Code releases and optimize configuration.
 | `/config-optimize` | Full optimization workflow |
 | `/config-optimize check` | Check only (no changes) |
 | `/config-optimize apply` | Apply pending proposals |
+
+## Early Exit Check (FIRST STEP)
+
+Before fetching releases, check if already current:
+
+```bash
+# 1. Get current version
+CURRENT=$(claude --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+
+# 2. Get last checked version
+LAST_CHECKED=$(cat ~/.claude/config-optimize-state.json 2>/dev/null | jq -r '.last_checked_version // "0.0.0"')
+LAST_DATE=$(cat ~/.claude/config-optimize-state.json 2>/dev/null | jq -r '.last_check_date // "1970-01-01"')
+
+# 3. Calculate days since last check
+DAYS_AGO=$(( ($(date +%s) - $(date -d "$LAST_DATE" +%s 2>/dev/null || echo 0)) / 86400 ))
+```
+
+**If `CURRENT == LAST_CHECKED` AND `DAYS_AGO < 7`:**
+- Output: "Config is current (v{CURRENT}, last checked {LAST_DATE}). No optimization needed."
+- **EXIT EARLY** (no WebFetch required)
+- Skip to Completion section
 
 ## Workflow
 
@@ -92,3 +113,18 @@ WebFetch("https://github.com/anthropics/claude-code/releases")
 | `/meta-iterate` | Prompts based on sessions |
 
 Weekly routine: `/config-optimize` then `/meta-iterate`
+
+## Completion
+
+After workflow completes (or early exit), always output:
+
+```
+## Config Optimization Complete
+
+- Current version: {version}
+- Last checked: {date}
+- Actions taken: {count} proposals applied / 0 (already current)
+- Next check recommended: {date + 7 days}
+```
+
+This signals to the user that the optimization is done.

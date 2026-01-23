@@ -110,6 +110,14 @@ function parseLedger(path: string): LedgerInfo {
   };
 }
 
+/**
+ * Get path to active ledger (for task-sync integration)
+ */
+export function getActiveLedgerPath(): string | null {
+  const ledger = findActiveLedger();
+  return ledger?.path || null;
+}
+
 export function ledgerStatus(): LedgerResult {
   const ledger = findActiveLedger();
 
