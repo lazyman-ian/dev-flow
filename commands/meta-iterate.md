@@ -53,6 +53,36 @@ Phase 4 (apply) requires explicit user approval before modifying any files.
 | Propose | `thoughts/proposals/PROP-YYYY-MM-DD.md` |
 | Apply | `thoughts/iterations/ITER-NNN.md` |
 
+## Data Sources
+
+Priority order (uses first available):
+
+| Priority | Source | Content | When |
+|----------|--------|---------|------|
+| 1 | Braintrust API | Full session analytics | API available |
+| 2 | Local JSONL | `~/.claude/projects/*/*.jsonl` | API unavailable |
+| 3 | Git + Ledger | Commit reasoning + task history | Minimal fallback |
+
+### Local Evaluation
+
+When Braintrust is unavailable, uses `~/.claude/scripts/local_evaluate.py`:
+
+```bash
+# Direct usage
+python ~/.claude/scripts/local_evaluate.py --recent 10
+
+# Output
+{
+  "data_quality": "local",
+  "session_count": 10,
+  "tool_distribution": {"Bash": 45, "Read": 30, ...},
+  "error_rate": 0.12,
+  "patterns": {
+    "suggestions": ["High Bash usage (35%). Consider Glob/Read/Grep."]
+  }
+}
+```
+
 ## Quick Start
 
 ```bash
@@ -67,4 +97,7 @@ Phase 4 (apply) requires explicit user approval before modifying any files.
 
 # After applying changes
 /meta-iterate verify
+
+# Force local evaluation (skip Braintrust)
+/meta-iterate evaluate --local
 ```

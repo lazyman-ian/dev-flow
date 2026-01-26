@@ -3223,8 +3223,8 @@ var require_utils = __commonJS({
       }
       return ind;
     }
-    function removeDotSegments(path4) {
-      let input = path4;
+    function removeDotSegments(path5) {
+      let input = path5;
       const output = [];
       let nextSlash = -1;
       let len = 0;
@@ -3423,8 +3423,8 @@ var require_schemes = __commonJS({
         wsComponent.secure = void 0;
       }
       if (wsComponent.resourceName) {
-        const [path4, query] = wsComponent.resourceName.split("?");
-        wsComponent.path = path4 && path4 !== "/" ? path4 : void 0;
+        const [path5, query] = wsComponent.resourceName.split("?");
+        wsComponent.path = path5 && path5 !== "/" ? path5 : void 0;
         wsComponent.query = query;
         wsComponent.resourceName = void 0;
       }
@@ -6777,12 +6777,12 @@ var require_dist = __commonJS({
         throw new Error(`Unknown format "${name}"`);
       return f;
     };
-    function addFormats(ajv, list, fs5, exportName) {
+    function addFormats(ajv, list, fs6, exportName) {
       var _a2;
       var _b;
       (_a2 = (_b = ajv.opts.code).formats) !== null && _a2 !== void 0 ? _a2 : _b.formats = (0, codegen_1._)`require("ajv-formats/dist/formats").${exportName}`;
       for (const f of list)
-        ajv.addFormat(f, fs5[f]);
+        ajv.addFormat(f, fs6[f]);
     }
     module2.exports = exports2 = formatsPlugin;
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -7149,8 +7149,8 @@ function getErrorMap() {
 
 // node_modules/zod/v3/helpers/parseUtil.js
 var makeIssue = (params) => {
-  const { data, path: path4, errorMaps, issueData } = params;
-  const fullPath = [...path4, ...issueData.path || []];
+  const { data, path: path5, errorMaps, issueData } = params;
+  const fullPath = [...path5, ...issueData.path || []];
   const fullIssue = {
     ...issueData,
     path: fullPath
@@ -7265,11 +7265,11 @@ var errorUtil;
 
 // node_modules/zod/v3/types.js
 var ParseInputLazyPath = class {
-  constructor(parent, value, path4, key) {
+  constructor(parent, value, path5, key) {
     this._cachedPath = [];
     this.parent = parent;
     this.data = value;
-    this._path = path4;
+    this._path = path5;
     this._key = key;
   }
   get path() {
@@ -10913,10 +10913,10 @@ function mergeDefs(...defs) {
 function cloneDef(schema) {
   return mergeDefs(schema._zod.def);
 }
-function getElementAtPath(obj, path4) {
-  if (!path4)
+function getElementAtPath(obj, path5) {
+  if (!path5)
     return obj;
-  return path4.reduce((acc, key) => acc?.[key], obj);
+  return path5.reduce((acc, key) => acc?.[key], obj);
 }
 function promiseAllObject(promisesObj) {
   const keys = Object.keys(promisesObj);
@@ -11299,11 +11299,11 @@ function aborted(x, startIndex = 0) {
   }
   return false;
 }
-function prefixIssues(path4, issues) {
+function prefixIssues(path5, issues) {
   return issues.map((iss) => {
     var _a2;
     (_a2 = iss).path ?? (_a2.path = []);
-    iss.path.unshift(path4);
+    iss.path.unshift(path5);
     return iss;
   });
 }
@@ -21333,6 +21333,8 @@ function getPlatformConfig(project) {
     formatFix: `swiftformat ${project.srcDir}`,
     formatCheck: `swiftformat ${project.srcDir} --dryrun`,
     buildCmd: `xcodebuild -workspace ${project.name}.xcworkspace -scheme "${project.name} QA" build`,
+    testCmd: `xcodebuild -workspace ${project.name}.xcworkspace -scheme "${project.name} QA" test -quiet`,
+    verifyCmd: `swiftlint lint --quiet --path ${project.srcDir} && xcodebuild -workspace ${project.name}.xcworkspace -scheme "${project.name} QA" build -quiet`,
     versionCmd,
     scopes: ["auth", "network", "ui", "home", "search", "listing", "map", "account"]
   };
@@ -21418,6 +21420,8 @@ function getPlatformConfig2() {
     formatFix: `${gradle} ktlintFormat`,
     formatCheck: `${gradle} ktlintCheck`,
     buildCmd: `${gradle} assembleDebug`,
+    testCmd: `${gradle} test --quiet`,
+    verifyCmd: `${gradle} ktlintCheck && ${gradle} assembleDebug --quiet`,
     versionCmd: `grep -oP 'versionName "\\K[^"]+' app/build.gradle`,
     scopes: ["app", "core", "feature", "data", "domain", "network", "ui"]
   };
@@ -21459,9 +21463,9 @@ function findActiveLedger() {
   const ledgerPath = (0, import_path.join)(ledgersPath, files[0]);
   return parseLedger(ledgerPath);
 }
-function parseLedger(path4) {
-  const content = (0, import_fs.readFileSync)(path4, "utf-8");
-  const name = (0, import_path.basename)(path4, ".md");
+function parseLedger(path5) {
+  const content = (0, import_fs.readFileSync)(path5, "utf-8");
+  const name = (0, import_path.basename)(path5, ".md");
   const taskMatch = name.match(/TASK-\d+/);
   const taskId = taskMatch ? taskMatch[0] : "";
   const updatedMatch = content.match(/^Updated:\s*(.+)$/m);
@@ -21475,7 +21479,7 @@ function parseLedger(path4) {
   const prUrl = prMatch ? prMatch[0] : void 0;
   return {
     name,
-    path: path4,
+    path: path5,
     taskId,
     updated,
     goal,
@@ -22357,6 +22361,236 @@ function exportLedgerAsJson(ledgerPath) {
   };
 }
 
+// src/coordination/coordinator.ts
+var TaskCoordinator = class {
+  tasks = /* @__PURE__ */ new Map();
+  enqueue(task) {
+    this.tasks.set(task.id, task);
+  }
+  detectConflicts(tasks) {
+    const fileToTasks = /* @__PURE__ */ new Map();
+    for (const task of tasks) {
+      for (const file2 of task.targetFiles) {
+        if (!fileToTasks.has(file2)) {
+          fileToTasks.set(file2, []);
+        }
+        fileToTasks.get(file2).push(task.id);
+      }
+    }
+    const conflicts = [];
+    for (const [file2, taskIds] of fileToTasks.entries()) {
+      if (taskIds.length > 1) {
+        conflicts.push({ file: file2, tasks: taskIds });
+      }
+    }
+    return conflicts;
+  }
+  onAgentComplete(agentId, result) {
+    for (const [taskId, task] of this.tasks.entries()) {
+      if (task.agentId === agentId && task.status === "in_progress") {
+        let newStatus;
+        switch (result.status) {
+          case "success":
+            newStatus = "completed";
+            break;
+          case "blocked":
+            newStatus = "blocked";
+            break;
+          case "failed":
+            newStatus = "failed";
+            break;
+          case "partial":
+          default:
+            newStatus = "in_progress";
+        }
+        this.tasks.set(taskId, { ...task, status: newStatus });
+        break;
+      }
+    }
+  }
+  getStatus() {
+    const tasks = Array.from(this.tasks.values());
+    return {
+      queuedTasks: tasks.filter((t) => t.status === "pending").length,
+      activeTasks: tasks.filter((t) => t.status === "in_progress").length,
+      completedTasks: tasks.filter((t) => t.status === "completed").length,
+      tasks
+    };
+  }
+  clear() {
+    this.tasks.clear();
+  }
+};
+
+// src/coordination/handoff-hub.ts
+var fs5 = __toESM(require("fs"));
+var path4 = __toESM(require("path"));
+var HandoffHub = class {
+  baseDir;
+  constructor(baseDir) {
+    this.baseDir = baseDir || path4.join(process.cwd(), "thoughts", "handoffs");
+    if (!fs5.existsSync(this.baseDir)) {
+      fs5.mkdirSync(this.baseDir, { recursive: true });
+    }
+  }
+  write(handoff) {
+    const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-").substring(0, 15);
+    const handoffId = `handoff-${timestamp}.md`;
+    const filePath = path4.join(this.baseDir, handoffId);
+    const content = this.serializeHandoff(handoff);
+    fs5.writeFileSync(filePath, content, "utf-8");
+    return handoffId;
+  }
+  read(handoffId) {
+    const filePath = path4.join(this.baseDir, handoffId);
+    if (!fs5.existsSync(filePath)) {
+      throw new Error(`Handoff not found: ${handoffId}`);
+    }
+    const content = fs5.readFileSync(filePath, "utf-8");
+    return this.parseHandoff(content);
+  }
+  readChain(taskId) {
+    const files = fs5.readdirSync(this.baseDir).filter((f) => f.endsWith(".md")).sort();
+    const handoffs = [];
+    for (const file2 of files) {
+      try {
+        const handoff = this.read(file2);
+        if (handoff.task_id === taskId) {
+          handoffs.push(handoff);
+        }
+      } catch (err) {
+      }
+    }
+    return handoffs;
+  }
+  aggregate(handoffIds) {
+    const handoffs = handoffIds.map((id) => this.read(id));
+    const result = {
+      totalHandoffs: handoffs.length,
+      successCount: handoffs.filter((h) => h.status === "success").length,
+      partialCount: handoffs.filter((h) => h.status === "partial").length,
+      blockedCount: handoffs.filter((h) => h.status === "blocked").length,
+      failedCount: handoffs.filter((h) => h.status === "failed").length,
+      filesModified: this.collectUniqueFiles(handoffs),
+      keyDecisions: this.mergeDecisions(handoffs),
+      openQuestions: this.collectQuestions(handoffs),
+      summary: this.generateSummary(handoffs)
+    };
+    return result;
+  }
+  serializeHandoff(handoff) {
+    const frontmatter = `---
+version: "${handoff.version}"
+agent_id: "${handoff.agent_id}"
+task_id: "${handoff.task_id}"
+${handoff.parent_handoff ? `parent_handoff: "${handoff.parent_handoff}"` : ""}
+timestamp: "${handoff.timestamp}"
+status: ${handoff.status}
+---
+
+# Summary
+${handoff.summary}
+
+# Changes Made
+${handoff.changes_made.map((f) => `- ${f}`).join("\n")}
+
+# Decisions
+${Object.entries(handoff.decisions).map(([k, v]) => `- **${k}**: ${v}`).join("\n")}
+
+# Verification
+${handoff.verification.map((v) => `- [ ] ${v}`).join("\n")}
+
+# For Next Agent
+${handoff.for_next_agent}
+
+# Open Questions
+${handoff.open_questions.map((q) => `- [ ] ${q}`).join("\n")}
+`;
+    return frontmatter.trim() + "\n";
+  }
+  parseHandoff(content) {
+    const frontmatterMatch = content.match(/^---\n([\s\S]+?)\n---/);
+    if (!frontmatterMatch) {
+      throw new Error("Invalid handoff format: missing frontmatter");
+    }
+    const frontmatter = frontmatterMatch[1];
+    const body = content.substring(frontmatterMatch[0].length);
+    const parseField = (field) => {
+      const match = frontmatter.match(new RegExp(`${field}:\\s*"?([^"
+]+)"?`));
+      return match ? match[1] : "";
+    };
+    const parseSection = (section) => {
+      const sectionMatch = body.match(new RegExp(`# ${section}\\n([\\s\\S]*?)(?=\\n#|$)`));
+      if (!sectionMatch) return [];
+      return sectionMatch[1].split("\n").filter((line) => line.trim().startsWith("-")).map((line) => line.replace(/^-\s*(?:\[\s*[x ]?\s*\]\s*)?/, "").trim()).filter(Boolean);
+    };
+    const parseSummary = () => {
+      const match = body.match(/# Summary\n([^\n]+)/);
+      return match ? match[1].trim() : "";
+    };
+    const parseForNext = () => {
+      const match = body.match(/# For Next Agent\n([^\n#]+)/);
+      return match ? match[1].trim() : "";
+    };
+    const parseDecisions = () => {
+      const decisions = {};
+      const sectionMatch = body.match(/# Decisions\n([\s\S]*?)(?=\n#|$)/);
+      if (sectionMatch) {
+        const lines = sectionMatch[1].split("\n");
+        for (const line of lines) {
+          const match = line.match(/^-\s*\*\*(.+?)\*\*:\s*(.+)$/);
+          if (match) {
+            decisions[match[1]] = match[2];
+          }
+        }
+      }
+      return decisions;
+    };
+    return {
+      version: parseField("version"),
+      agent_id: parseField("agent_id"),
+      task_id: parseField("task_id"),
+      parent_handoff: parseField("parent_handoff") || void 0,
+      timestamp: parseField("timestamp"),
+      status: parseField("status"),
+      summary: parseSummary(),
+      changes_made: parseSection("Changes Made"),
+      decisions: parseDecisions(),
+      verification: parseSection("Verification"),
+      for_next_agent: parseForNext(),
+      open_questions: parseSection("Open Questions")
+    };
+  }
+  collectUniqueFiles(handoffs) {
+    const files = /* @__PURE__ */ new Set();
+    for (const handoff of handoffs) {
+      for (const file2 of handoff.changes_made) {
+        files.add(file2);
+      }
+    }
+    return Array.from(files).sort();
+  }
+  mergeDecisions(handoffs) {
+    const decisions = {};
+    for (const handoff of handoffs) {
+      Object.assign(decisions, handoff.decisions);
+    }
+    return decisions;
+  }
+  collectQuestions(handoffs) {
+    const questions = [];
+    for (const handoff of handoffs) {
+      questions.push(...handoff.open_questions);
+    }
+    return questions;
+  }
+  generateSummary(handoffs) {
+    const summaries = handoffs.map((h) => `${h.agent_id}: ${h.summary}`);
+    return summaries.join("; ");
+  }
+};
+
 // src/index.ts
 var server = new Server(
   { name: "dev-flow-mcp", version: "2.1.0" },
@@ -22553,6 +22787,62 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           ledgerPath: { type: "string", description: "Override ledger path (default: active ledger)" }
         }
       }
+    },
+    // Coordination tools
+    {
+      name: "dev_coordinate",
+      description: "[~40 tokens] Multi-agent task coordination (plan/dispatch/status/cancel)",
+      inputSchema: {
+        type: "object",
+        properties: {
+          action: {
+            type: "string",
+            enum: ["plan", "dispatch", "status", "cancel"],
+            description: "Action to perform"
+          },
+          mode: {
+            type: "string",
+            enum: ["pipeline", "fan-out", "master-worker", "review-chain"],
+            description: "Collaboration mode (for plan)"
+          },
+          tasks: { type: "string", description: "JSON array of tasks (for plan/dispatch)" },
+          taskId: { type: "string", description: "Task ID (for cancel)" }
+        }
+      }
+    },
+    {
+      name: "dev_handoff",
+      description: "[~50 tokens] Agent handoff management (write/read/chain/search)",
+      inputSchema: {
+        type: "object",
+        properties: {
+          action: {
+            type: "string",
+            enum: ["write", "read", "chain", "search"],
+            description: "Action to perform"
+          },
+          handoff: { type: "string", description: "JSON handoff object (for write)" },
+          handoffId: { type: "string", description: "Handoff ID (for read)" },
+          taskId: { type: "string", description: "Task ID (for chain)" },
+          keyword: { type: "string", description: "Search keyword (for search)" }
+        }
+      }
+    },
+    {
+      name: "dev_aggregate",
+      description: "[~60 tokens] Aggregate handoff results (summary/detailed/pr_ready)",
+      inputSchema: {
+        type: "object",
+        properties: {
+          action: {
+            type: "string",
+            enum: ["summary", "detailed", "pr_ready"],
+            description: "Aggregation format"
+          },
+          handoffIds: { type: "string", description: "JSON array of handoff IDs" },
+          taskId: { type: "string", description: "Task ID to aggregate all handoffs for" }
+        }
+      }
     }
   ]
 }));
@@ -22688,6 +22978,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return defaultsTool(args?.action);
       case "dev_tasks":
         return tasksTool(args?.action, args?.ledgerPath);
+      // Coordination tools
+      case "dev_coordinate":
+        return coordinateTool(args?.action, args?.mode, args?.tasks, args?.taskId);
+      case "dev_handoff":
+        return handoffTool(args?.action, args?.handoff, args?.handoffId, args?.taskId, args?.keyword);
+      case "dev_aggregate":
+        return aggregateTool(args?.action, args?.handoffIds, args?.taskId);
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
@@ -23129,25 +23426,172 @@ function defaultsTool(action) {
   }
 }
 function tasksTool(action, ledgerPath) {
-  const path4 = ledgerPath || getActiveLedgerPath?.() || "";
-  if (!path4) {
+  const path5 = ledgerPath || getActiveLedgerPath?.() || "";
+  if (!path5) {
     return { content: [{ type: "text", text: 'NO_LEDGER|Create with dev_ledger(action:"create")' }] };
   }
   switch (action) {
     case "summary":
-      return { content: [{ type: "text", text: getTaskSyncSummary(path4) }] };
+      return { content: [{ type: "text", text: getTaskSyncSummary(path5) }] };
     case "export":
-      const exported = exportLedgerAsJson(path4);
+      const exported = exportLedgerAsJson(path5);
       if (!exported) {
         return { content: [{ type: "text", text: "\u274C Failed to export ledger" }] };
       }
       const commands = generateTaskCommands(exported.tasks);
       return { content: [{ type: "text", text: commands || "NO_TASKS|All completed or empty" }] };
     case "sync":
-      const tasks = parseLedgerState(path4);
+      const tasks = parseLedgerState(path5);
       return { content: [{ type: "text", text: formatTasksAsMarkdown(tasks) }] };
     default:
       return { content: [{ type: "text", text: "\u274C Action required: summary|export|sync" }] };
+  }
+}
+var taskCoordinator = new TaskCoordinator();
+var handoffHub = new HandoffHub();
+function coordinateTool(action, mode, tasksJson, taskId) {
+  switch (action) {
+    case "plan": {
+      if (!mode || !tasksJson) {
+        return { content: [{ type: "text", text: "\u274C mode and tasks required for plan" }] };
+      }
+      const tasks = JSON.parse(tasksJson);
+      const conflicts = taskCoordinator.detectConflicts(tasks);
+      let result = `Mode: ${mode}
+Tasks: ${tasks.length}
+`;
+      if (conflicts.length > 0) {
+        result += `
+\u26A0\uFE0F Conflicts detected:
+`;
+        conflicts.forEach((c) => {
+          result += `  ${c.file}: ${c.tasks.join(", ")}
+`;
+        });
+      } else {
+        result += "\n\u2705 No conflicts detected";
+      }
+      return { content: [{ type: "text", text: result }] };
+    }
+    case "dispatch": {
+      if (!tasksJson) {
+        return { content: [{ type: "text", text: "\u274C tasks required for dispatch" }] };
+      }
+      const tasks = JSON.parse(tasksJson);
+      tasks.forEach((t) => taskCoordinator.enqueue(t));
+      return { content: [{ type: "text", text: `\u2705 Dispatched ${tasks.length} tasks` }] };
+    }
+    case "status": {
+      const status = taskCoordinator.getStatus();
+      const result = `Queued: ${status.queuedTasks} | Active: ${status.activeTasks} | Completed: ${status.completedTasks}`;
+      return { content: [{ type: "text", text: result }] };
+    }
+    case "cancel": {
+      if (!taskId) {
+        return { content: [{ type: "text", text: "\u274C taskId required for cancel" }] };
+      }
+      return { content: [{ type: "text", text: `\u2705 Cancelled task ${taskId}` }] };
+    }
+    default:
+      return { content: [{ type: "text", text: "\u274C Action required: plan|dispatch|status|cancel" }] };
+  }
+}
+function handoffTool(action, handoffJson, handoffId, taskId, keyword) {
+  switch (action) {
+    case "write": {
+      if (!handoffJson) {
+        return { content: [{ type: "text", text: "\u274C handoff JSON required for write" }] };
+      }
+      const handoff = JSON.parse(handoffJson);
+      const id = handoffHub.write(handoff);
+      return { content: [{ type: "text", text: `\u2705 Handoff written: ${id}` }] };
+    }
+    case "read": {
+      if (!handoffId) {
+        return { content: [{ type: "text", text: "\u274C handoffId required for read" }] };
+      }
+      const handoff = handoffHub.read(handoffId);
+      return { content: [{ type: "text", text: JSON.stringify(handoff, null, 2) }] };
+    }
+    case "chain": {
+      if (!taskId) {
+        return { content: [{ type: "text", text: "\u274C taskId required for chain" }] };
+      }
+      const chain = handoffHub.readChain(taskId);
+      const result = `Found ${chain.length} handoffs for ${taskId}:
+` + chain.map((h) => `  ${h.agent_id}: ${h.status} - ${h.summary}`).join("\n");
+      return { content: [{ type: "text", text: result }] };
+    }
+    case "search": {
+      if (!keyword) {
+        return { content: [{ type: "text", text: "\u274C keyword required for search" }] };
+      }
+      return { content: [{ type: "text", text: `Searching for: ${keyword}` }] };
+    }
+    default:
+      return { content: [{ type: "text", text: "\u274C Action required: write|read|chain|search" }] };
+  }
+}
+function aggregateTool(action, handoffIdsJson, taskId) {
+  let handoffIds = [];
+  if (handoffIdsJson) {
+    handoffIds = JSON.parse(handoffIdsJson);
+  } else if (taskId) {
+    const chain = handoffHub.readChain(taskId);
+    handoffIds = chain.map((h) => `handoff-${h.timestamp}.md`);
+  } else {
+    return { content: [{ type: "text", text: "\u274C handoffIds or taskId required" }] };
+  }
+  const result = handoffHub.aggregate(handoffIds);
+  switch (action) {
+    case "summary": {
+      const text = `${result.totalHandoffs} handoffs | \u2705${result.successCount} \u26A0\uFE0F${result.partialCount} \u{1F6AB}${result.blockedCount} \u274C${result.failedCount}`;
+      return { content: [{ type: "text", text }] };
+    }
+    case "detailed": {
+      let text = `## Aggregated Results
+
+`;
+      text += `Total: ${result.totalHandoffs} | Success: ${result.successCount} | Partial: ${result.partialCount} | Blocked: ${result.blockedCount} | Failed: ${result.failedCount}
+
+`;
+      text += `### Files Modified (${result.filesModified.length})
+`;
+      result.filesModified.forEach((f) => text += `- ${f}
+`);
+      text += `
+### Key Decisions
+`;
+      Object.entries(result.keyDecisions).forEach(([k, v]) => text += `- **${k}**: ${v}
+`);
+      if (result.openQuestions.length > 0) {
+        text += `
+### Open Questions
+`;
+        result.openQuestions.forEach((q) => text += `- ${q}
+`);
+      }
+      return { content: [{ type: "text", text }] };
+    }
+    case "pr_ready": {
+      let text = `## PR Summary
+
+${result.summary}
+
+`;
+      text += `### Changes
+`;
+      result.filesModified.forEach((f) => text += `- ${f}
+`);
+      text += `
+### Technical Decisions
+`;
+      Object.entries(result.keyDecisions).forEach(([k, v]) => text += `- **${k}**: ${v}
+`);
+      return { content: [{ type: "text", text }] };
+    }
+    default:
+      return { content: [{ type: "text", text: "\u274C Action required: summary|detailed|pr_ready" }] };
   }
 }
 async function main() {

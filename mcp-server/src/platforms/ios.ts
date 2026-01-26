@@ -189,6 +189,8 @@ export interface PlatformConfig {
   formatFix: string;
   formatCheck: string;
   buildCmd: string;
+  testCmd: string;
+  verifyCmd: string;
   versionCmd: string;
   scopes: string[];
 }
@@ -215,6 +217,8 @@ export function getPlatformConfig(project: ProjectInfo): PlatformConfig {
     formatFix: `swiftformat ${project.srcDir}`,
     formatCheck: `swiftformat ${project.srcDir} --dryrun`,
     buildCmd: `xcodebuild -workspace ${project.name}.xcworkspace -scheme "${project.name} QA" build`,
+    testCmd: `xcodebuild -workspace ${project.name}.xcworkspace -scheme "${project.name} QA" test -quiet`,
+    verifyCmd: `swiftlint lint --quiet --path ${project.srcDir} && xcodebuild -workspace ${project.name}.xcworkspace -scheme "${project.name} QA" build -quiet`,
     versionCmd,
     scopes: ['auth', 'network', 'ui', 'home', 'search', 'listing', 'map', 'account'],
   };

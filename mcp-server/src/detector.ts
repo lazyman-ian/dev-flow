@@ -21,6 +21,8 @@ export interface DevFlowConfig {
     fix: string;
     check: string;
     build?: string;
+    test?: string;
+    verify?: string;
   };
   scopes?: string[];
 }

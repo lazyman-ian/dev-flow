@@ -1,7 +1,7 @@
 {
   "name": "dev-flow",
-  "version": "3.11.1",
-  "description": "Unified development workflow: planning → coding → commit → PR → release with full automation",
+  "version": "3.12.0",
+  "description": "Unified development workflow: planning → coding → commit → PR → release with VDD (Verification-Driven Development)",
   "author": {
     "name": "lazyman"
   },
@@ -17,10 +17,23 @@
     "reasoning",
     "task-management",
     "meta-iterate",
-    "self-improve"
+    "self-improve",
+    "vdd",
+    "verification"
   ],
   "skills": "./skills/",
   "commands": "./commands/",
   "mcpServers": "./.mcp.json",
-  "lspServers": "./.lsp.json"
+  "lspServers": "./.lsp.json",
+  "bundledMcpServers": {
+    "dev-flow-mcp": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/mcp-server.cjs"],
+      "autoStart": true,
+      "restartOnCrash": true,
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
 }

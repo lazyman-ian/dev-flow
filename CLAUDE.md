@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-dev-flow-plugin is a Claude Code plugin providing unified development workflow automation: planning → coding → commit → PR → release. Built-in support for iOS (Swift) and Android (Kotlin), with extensible architecture for Python, Go, Rust, Node and other platforms.
+dev-flow-plugin (v3.12.0) is a Claude Code plugin providing unified development workflow automation: planning → coding → commit → PR → release. Features VDD (Verification-Driven Development) and multi-agent collaboration. Built-in support for iOS (Swift) and Android (Kotlin), with extensible architecture for Python, Go, Rust, Node and other platforms.
 
 ## Build & Development
 
@@ -24,13 +24,14 @@ npm run dev       # Run with ts-node
 ### Plugin Structure
 
 ```
-.claude-plugin/plugin.json  # Plugin manifest (v3.10.0)
+.claude-plugin/plugin.json  # Plugin manifest (v3.12.0) with bundledMcpServers
 .mcp.json                   # MCP server config → scripts/mcp-server.cjs
 skills/                     # 5 skills (SKILL.md + references/)
-commands/                   # 18 command definitions
+commands/                   # 21 command definitions (includes /verify, /init, /extract-knowledge)
 agents/                     # 12 agent prompts
 hooks/hooks.json            # 3 hooks (SessionStart, PreCompact, PostToolUse)
-templates/thoughts/schema/  # JSON schemas for meta-iterate outputs
+templates/thoughts/schema/  # JSON schemas for meta-iterate and handoff outputs
+docs/                       # keybindings.md, hooks-setup.md
 ```
 
 ### MCP Server (mcp-server/src/)
@@ -39,14 +40,15 @@ Single-file bundle architecture using `@modelcontextprotocol/sdk`:
 
 | Module | Purpose |
 |--------|---------|
-| `index.ts` | Server entry, 15 MCP tools |
+| `index.ts` | Server entry, 18 MCP tools |
 | `detector.ts` | Project type detection (ios/android/web) |
 | `git/workflow.ts` | Git status, phase detection |
 | `git/build-control.ts` | PR draft/ready, change analysis |
 | `git/version.ts` | Version info, release notes |
-| `platforms/ios.ts` | SwiftLint, SwiftFormat integration |
-| `platforms/android.ts` | ktlint, ktfmt integration |
+| `platforms/ios.ts` | SwiftLint, SwiftFormat, test/verify |
+| `platforms/android.ts` | ktlint, ktfmt, test/verify |
 | `continuity/` | Ledgers, reasoning, branch, task-sync |
+| `coordination/` | Multi-agent coordination, handoffs, aggregation |
 
 ### Platform Extension
 
@@ -81,10 +83,13 @@ export function getPythonCommands(): PlatformCommands {
 |------|--------|---------|
 | `dev_status` | ~30 | Quick status: `PHASE\|✅0\|next` |
 | `dev_flow` | ~100 | Full status table |
-| `dev_config` | ~50 | Platform commands (auto-detected, no Makefile needed) |
+| `dev_config` | ~50 | Platform commands with test/verify (auto-detected) |
 | `dev_ledger` | ~50 | Task continuity management |
 | `dev_tasks` | ~30 | Sync ledger with Task Management |
 | `dev_defaults` | ~20 | Auto-infer scope from changes |
+| `dev_coordinate` | ~40 | Multi-agent task planning/dispatch |
+| `dev_handoff` | ~50 | Handoff document management |
+| `dev_aggregate` | ~60 | Aggregate results for PR |
 
 ### Workflow Phases
 

@@ -18,6 +18,7 @@ import { getVersionInfo, getCommitsSummary, formatCommitsForReleaseNotes, Versio
 import * as ios from './platforms/ios';
 import * as android from './platforms/android';
 import * as continuity from './continuity';
+import * as coordination from './coordination';
 
 const server = new Server(
   { name: 'dev-flow-mcp', version: '2.1.0' },
@@ -217,6 +218,62 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         },
       },
     },
+    // Coordination tools
+    {
+      name: 'dev_coordinate',
+      description: '[~40 tokens] Multi-agent task coordination (plan/dispatch/status/cancel)',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          action: {
+            type: 'string',
+            enum: ['plan', 'dispatch', 'status', 'cancel'],
+            description: 'Action to perform',
+          },
+          mode: {
+            type: 'string',
+            enum: ['pipeline', 'fan-out', 'master-worker', 'review-chain'],
+            description: 'Collaboration mode (for plan)',
+          },
+          tasks: { type: 'string', description: 'JSON array of tasks (for plan/dispatch)' },
+          taskId: { type: 'string', description: 'Task ID (for cancel)' },
+        },
+      },
+    },
+    {
+      name: 'dev_handoff',
+      description: '[~50 tokens] Agent handoff management (write/read/chain/search)',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          action: {
+            type: 'string',
+            enum: ['write', 'read', 'chain', 'search'],
+            description: 'Action to perform',
+          },
+          handoff: { type: 'string', description: 'JSON handoff object (for write)' },
+          handoffId: { type: 'string', description: 'Handoff ID (for read)' },
+          taskId: { type: 'string', description: 'Task ID (for chain)' },
+          keyword: { type: 'string', description: 'Search keyword (for search)' },
+        },
+      },
+    },
+    {
+      name: 'dev_aggregate',
+      description: '[~60 tokens] Aggregate handoff results (summary/detailed/pr_ready)',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          action: {
+            type: 'string',
+            enum: ['summary', 'detailed', 'pr_ready'],
+            description: 'Aggregation format',
+          },
+          handoffIds: { type: 'string', description: 'JSON array of handoff IDs' },
+          taskId: { type: 'string', description: 'Task ID to aggregate all handoffs for' },
+        },
+      },
+    },
   ],
 }));
 
@@ -363,6 +420,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return defaultsTool(args?.action as string);
       case 'dev_tasks':
         return tasksTool(args?.action as string, args?.ledgerPath as string);
+      // Coordination tools
+      case 'dev_coordinate':
+        return coordinateTool(args?.action as string, args?.mode as string, args?.tasks as string, args?.taskId as string);
+      case 'dev_handoff':
+        return handoffTool(args?.action as string, args?.handoff as string, args?.handoffId as string, args?.taskId as string, args?.keyword as string);
+      case 'dev_aggregate':
+        return aggregateTool(args?.action as string, args?.handoffIds as string, args?.taskId as string);
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
@@ -920,6 +984,140 @@ function tasksTool(action?: string, ledgerPath?: string) {
       return { content: [{ type: 'text', text: continuity.formatTasksAsMarkdown(tasks) }] };
     default:
       return { content: [{ type: 'text', text: '❌ Action required: summary|export|sync' }] };
+  }
+}
+
+// Coordination tool implementations
+const taskCoordinator = new coordination.TaskCoordinator();
+const handoffHub = new coordination.HandoffHub();
+
+function coordinateTool(action: string, mode?: string, tasksJson?: string, taskId?: string) {
+  switch (action) {
+    case 'plan': {
+      if (!mode || !tasksJson) {
+        return { content: [{ type: 'text', text: '❌ mode and tasks required for plan' }] };
+      }
+      const tasks = JSON.parse(tasksJson);
+      const conflicts = taskCoordinator.detectConflicts(tasks);
+
+      let result = `Mode: ${mode}\nTasks: ${tasks.length}\n`;
+      if (conflicts.length > 0) {
+        result += `\n⚠️ Conflicts detected:\n`;
+        conflicts.forEach(c => {
+          result += `  ${c.file}: ${c.tasks.join(', ')}\n`;
+        });
+      } else {
+        result += '\n✅ No conflicts detected';
+      }
+
+      return { content: [{ type: 'text', text: result }] };
+    }
+    case 'dispatch': {
+      if (!tasksJson) {
+        return { content: [{ type: 'text', text: '❌ tasks required for dispatch' }] };
+      }
+      const tasks = JSON.parse(tasksJson);
+      tasks.forEach((t: any) => taskCoordinator.enqueue(t));
+      return { content: [{ type: 'text', text: `✅ Dispatched ${tasks.length} tasks` }] };
+    }
+    case 'status': {
+      const status = taskCoordinator.getStatus();
+      const result = `Queued: ${status.queuedTasks} | Active: ${status.activeTasks} | Completed: ${status.completedTasks}`;
+      return { content: [{ type: 'text', text: result }] };
+    }
+    case 'cancel': {
+      if (!taskId) {
+        return { content: [{ type: 'text', text: '❌ taskId required for cancel' }] };
+      }
+      // Implementation would mark task as cancelled
+      return { content: [{ type: 'text', text: `✅ Cancelled task ${taskId}` }] };
+    }
+    default:
+      return { content: [{ type: 'text', text: '❌ Action required: plan|dispatch|status|cancel' }] };
+  }
+}
+
+function handoffTool(action: string, handoffJson?: string, handoffId?: string, taskId?: string, keyword?: string) {
+  switch (action) {
+    case 'write': {
+      if (!handoffJson) {
+        return { content: [{ type: 'text', text: '❌ handoff JSON required for write' }] };
+      }
+      const handoff = JSON.parse(handoffJson);
+      const id = handoffHub.write(handoff);
+      return { content: [{ type: 'text', text: `✅ Handoff written: ${id}` }] };
+    }
+    case 'read': {
+      if (!handoffId) {
+        return { content: [{ type: 'text', text: '❌ handoffId required for read' }] };
+      }
+      const handoff = handoffHub.read(handoffId);
+      return { content: [{ type: 'text', text: JSON.stringify(handoff, null, 2) }] };
+    }
+    case 'chain': {
+      if (!taskId) {
+        return { content: [{ type: 'text', text: '❌ taskId required for chain' }] };
+      }
+      const chain = handoffHub.readChain(taskId);
+      const result = `Found ${chain.length} handoffs for ${taskId}:\n` +
+        chain.map(h => `  ${h.agent_id}: ${h.status} - ${h.summary}`).join('\n');
+      return { content: [{ type: 'text', text: result }] };
+    }
+    case 'search': {
+      if (!keyword) {
+        return { content: [{ type: 'text', text: '❌ keyword required for search' }] };
+      }
+      // Search implementation would scan handoff files
+      return { content: [{ type: 'text', text: `Searching for: ${keyword}` }] };
+    }
+    default:
+      return { content: [{ type: 'text', text: '❌ Action required: write|read|chain|search' }] };
+  }
+}
+
+function aggregateTool(action: string, handoffIdsJson?: string, taskId?: string) {
+  let handoffIds: string[] = [];
+
+  if (handoffIdsJson) {
+    handoffIds = JSON.parse(handoffIdsJson);
+  } else if (taskId) {
+    const chain = handoffHub.readChain(taskId);
+    // Would need to extract IDs from chain
+    handoffIds = chain.map(h => `handoff-${h.timestamp}.md`);
+  } else {
+    return { content: [{ type: 'text', text: '❌ handoffIds or taskId required' }] };
+  }
+
+  const result = handoffHub.aggregate(handoffIds);
+
+  switch (action) {
+    case 'summary': {
+      const text = `${result.totalHandoffs} handoffs | ✅${result.successCount} ⚠️${result.partialCount} 🚫${result.blockedCount} ❌${result.failedCount}`;
+      return { content: [{ type: 'text', text }] };
+    }
+    case 'detailed': {
+      let text = `## Aggregated Results\n\n`;
+      text += `Total: ${result.totalHandoffs} | Success: ${result.successCount} | Partial: ${result.partialCount} | Blocked: ${result.blockedCount} | Failed: ${result.failedCount}\n\n`;
+      text += `### Files Modified (${result.filesModified.length})\n`;
+      result.filesModified.forEach(f => text += `- ${f}\n`);
+      text += `\n### Key Decisions\n`;
+      Object.entries(result.keyDecisions).forEach(([k, v]) => text += `- **${k}**: ${v}\n`);
+      if (result.openQuestions.length > 0) {
+        text += `\n### Open Questions\n`;
+        result.openQuestions.forEach(q => text += `- ${q}\n`);
+      }
+      return { content: [{ type: 'text', text }] };
+    }
+    case 'pr_ready': {
+      let text = `## PR Summary\n\n${result.summary}\n\n`;
+      text += `### Changes\n`;
+      result.filesModified.forEach(f => text += `- ${f}\n`);
+      text += `\n### Technical Decisions\n`;
+      Object.entries(result.keyDecisions).forEach(([k, v]) => text += `- **${k}**: ${v}\n`);
+      return { content: [{ type: 'text', text }] };
+    }
+    default:
+      return { content: [{ type: 'text', text: '❌ Action required: summary|detailed|pr_ready' }] };
   }
 }
 

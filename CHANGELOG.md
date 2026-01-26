@@ -2,7 +2,48 @@
 
 All notable changes to dev-flow-plugin will be documented in this file.
 
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
 Author: lazyman
+
+## [3.12.0] - 2026-01-27
+
+### Added
+
+- **VDD (Verification-Driven Development)**
+  - `/dev-flow:verify` command for lint + typecheck + tests
+  - Platform configs now include `testCmd` and `verifyCmd`
+  - Machine judges completion via exit code 0
+
+- **Multi-Agent Coordination**
+  - `dev_coordinate` tool for task planning and dispatch
+  - `dev_handoff` tool for agent handoff documents
+  - `dev_aggregate` tool for aggregating multi-agent results
+  - New `coordination/` module in MCP server
+
+- **Knowledge Base**
+  - Cross-project knowledge at `~/.claude/knowledge/`
+  - `/dev-flow:extract-knowledge` command
+  - Auto-load platform pitfalls at session start
+  - Structure: platforms/, patterns/, discoveries/
+
+- **Documentation**
+  - `docs/GUIDE.md` - Chinese complete guide (~600 lines)
+  - `docs/GUIDE_EN.md` - English complete guide (~550 lines)
+  - `CONTRIBUTING.md` - Contribution guidelines
+  - README restructured with badges and collapsible sections
+
+### Changed
+
+- MCP tools: 14 → 18
+- Commands: 18 → 21
+- Platform configs extended with test/verify
+- README in mainstream open-source style
+
+### Fixed
+
+- Background agent permission handling
+- zoxide alias compatibility in hooks
 
 ## [3.11.0] - 2026-01-24
 

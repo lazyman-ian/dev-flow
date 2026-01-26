@@ -172,6 +172,8 @@ export interface PlatformConfig {
   formatFix: string;
   formatCheck: string;
   buildCmd: string;
+  testCmd: string;
+  verifyCmd: string;
   versionCmd: string;
   scopes: string[];
 }
@@ -185,6 +187,8 @@ export function getPlatformConfig(): PlatformConfig {
     formatFix: `${gradle} ktlintFormat`,
     formatCheck: `${gradle} ktlintCheck`,
     buildCmd: `${gradle} assembleDebug`,
+    testCmd: `${gradle} test --quiet`,
+    verifyCmd: `${gradle} ktlintCheck && ${gradle} assembleDebug --quiet`,
     versionCmd: `grep -oP 'versionName "\\K[^"]+' app/build.gradle`,
     scopes: ['app', 'core', 'feature', 'data', 'domain', 'network', 'ui'],
   };
