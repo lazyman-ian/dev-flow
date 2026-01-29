@@ -1,6 +1,6 @@
 # dev-flow Plugin 完整指南
 
-> Claude Code 开发工作流自动化插件 | v3.12.0
+> Claude Code 开发工作流自动化插件 | v3.13.0
 
 ## 目录
 
@@ -529,7 +529,7 @@ StatusLine 自动显示:
 
 ## 版本历史
 
-### v3.12.0 (2026-01-27)
+### v3.13.0 (2026-01-27)
 
 - **VDD**: Verification-Driven Development
 - **Multi-Agent**: TaskCoordinator + HandoffHub

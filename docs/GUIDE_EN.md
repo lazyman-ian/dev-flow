@@ -1,6 +1,6 @@
 # dev-flow Plugin Complete Guide
 
-> Claude Code Development Workflow Automation | v3.12.0
+> Claude Code Development Workflow Automation | v3.13.0
 
 ## Table of Contents
 
@@ -527,7 +527,7 @@ Bidirectional sync:
 
 ## Version History
 
-### v3.12.0 (2026-01-27)
+### v3.13.0 (2026-01-27)
 
 - **VDD**: Verification-Driven Development
 - **Multi-Agent**: TaskCoordinator + HandoffHub
