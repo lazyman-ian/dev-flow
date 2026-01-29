@@ -1,7 +1,7 @@
 ---
 name: debug-agent
 description: Debug issues by investigating logs, code, and git history. <example>User says "debug this crash"</example> <example>User says "investigate why this is failing"</example> <example>用户说 "调试这个问题" 或 "排查错误"</example>
-model: sonnet
+model: opus
 color: red
 ---
 
