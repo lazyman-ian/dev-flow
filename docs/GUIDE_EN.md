@@ -41,13 +41,12 @@
 ### Installation
 
 ```bash
-# Option 1: From GitHub
-/plugins add-marketplace lazyman-ian --github lazyman-ian/dev-flow
-/plugins add dev-flow@lazyman-ian
+# Option 1: From Marketplace (recommended)
+claude plugins add-marketplace lazyman-ian --github lazyman-ian/claude-plugins
+claude plugins add dev-flow@lazyman-ian
 
 # Option 2: Local development
-/plugins add-marketplace local --directory /path/to/dev-flow-plugin
-/plugins add dev-flow@local
+claude plugins add /path/to/dev-flow
 ```
 
 ### Verify Installation

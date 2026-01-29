@@ -41,13 +41,12 @@
 ### 安装
 
 ```bash
-# 方式 1: 从 GitHub
-/plugins add-marketplace lazyman-ian --github lazyman-ian/dev-flow
-/plugins add dev-flow@lazyman-ian
+# 方式 1: 从 Marketplace 安装（推荐）
+claude plugins add-marketplace lazyman-ian --github lazyman-ian/claude-plugins
+claude plugins add dev-flow@lazyman-ian
 
 # 方式 2: 本地开发
-/plugins add-marketplace local --directory /path/to/dev-flow-plugin
-/plugins add dev-flow@local
+claude plugins add /path/to/dev-flow
 ```
 
 ### 验证安装
