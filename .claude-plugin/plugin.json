@@ -24,16 +24,5 @@
   "skills": "./skills/",
   "commands": "./commands/",
   "mcpServers": "./.mcp.json",
-  "lspServers": "./.lsp.json",
-  "bundledMcpServers": {
-    "dev-flow-mcp": {
-      "command": "node",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/mcp-server.cjs"],
-      "autoStart": true,
-      "restartOnCrash": true,
-      "env": {
-        "NODE_ENV": "production"
-      }
-    }
-  }
+  "lspServers": "./.lsp.json"
 }
