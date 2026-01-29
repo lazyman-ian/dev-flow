@@ -1,6 +1,6 @@
 ---
 name: config-optimize
-description: Checks Claude Code releases and optimizes Claude Code configuration for new features. Use when user explicitly says "/config-optimize", "check claude updates", "optimize claude settings", "claude new features", "Claude配置优化", "检查Claude更新", "Claude新功能". NOT for general "optimize" requests, documentation reading, or when user references files with "optimization" in the name.
+description: Checks Claude Code releases and optimizes Claude Code configuration for new features. This skill should be used when user explicitly says "/config-optimize", "check claude updates", "optimize claude settings", "claude new features", "Claude配置优化", "检查Claude更新", "Claude新功能". NOT for general "optimize" requests, documentation reading, or when user references files with "optimization" in the name.
 model: haiku
 allowed-tools: [Read, Glob, Grep, Write, Edit, Bash, WebFetch, TaskCreate, TaskUpdate]
 ---
