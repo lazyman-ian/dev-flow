@@ -24,7 +24,7 @@ npm run dev       # Run with ts-node
 ### Plugin Structure
 
 ```
-.claude-plugin/plugin.json  # Plugin manifest (v3.12.0) with bundledMcpServers
+.claude-plugin/plugin.json  # Plugin manifest (v3.12.0)
 .mcp.json                   # MCP server config → scripts/mcp-server.cjs
 skills/                     # 5 skills (SKILL.md + references/)
 commands/                   # 21 command definitions (includes /verify, /init, /extract-knowledge)
@@ -115,6 +115,12 @@ description: What it does. Use when "[triggers]", "[中文触发词]".
 allowed-tools: [specific, tools, only]
 ---
 ```
+
+## Plugin Manifest Rules
+
+**Unsupported fields** (will cause validation error):
+- `bundledMcpServers` - Use `mcpServers: "./.mcp.json"` instead
+- `agents` - Auto-discovered from agents/ directory
 
 ## Key Patterns
 
