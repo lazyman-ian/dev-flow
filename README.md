@@ -52,31 +52,27 @@
 
 ## Installation
 
-### From GitHub
+### From Marketplace
 
 ```bash
-# Add marketplace
-/plugins add-marketplace lazyman-ian --github lazyman-ian/dev-flow
+# Add marketplace (one-time)
+claude plugins add-marketplace lazyman-ian --github lazyman-ian/claude-plugins
 
 # Install plugin
-/plugins add dev-flow@lazyman-ian
+claude plugins add dev-flow@lazyman-ian
 ```
 
 ### From Local Directory
 
 ```bash
-# Add local directory
-/plugins add-marketplace local --directory /path/to/dev-flow-plugin
-
-# Install plugin
-/plugins add dev-flow@local
+claude plugins add /path/to/dev-flow
 ```
 
 ### Verify
 
 ```bash
-/dev-flow:dev
-# Output: STARTING|✅0|checkout
+/plugin  # Check plugin load status
+/dev     # Test dev workflow
 ```
 
 ## Quick Start
@@ -349,8 +345,7 @@ npm install
 npm run bundle
 
 # Test locally
-/plugins add-marketplace local --directory /path/to/dev-flow
-/plugins add dev-flow@local
+claude plugins add /path/to/dev-flow
 ```
 
 ## Acknowledgements
