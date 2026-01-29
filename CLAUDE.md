@@ -121,6 +121,7 @@ allowed-tools: [specific, tools, only]
 **Unsupported fields** (will cause validation error):
 - `bundledMcpServers` - Use `mcpServers: "./.mcp.json"` instead
 - `agents` - Auto-discovered from agents/ directory
+- `hooks` - Auto-discovered from hooks/hooks.json
 
 ## Key Patterns
 
