@@ -50,6 +50,16 @@
     ],
     "PostToolUse": [
       {
+        "matcher": "Read|Edit|Write|Bash|Grep|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/tool-counter.sh",
+            "timeout": 3
+          }
+        ]
+      },
+      {
         "matcher": "Bash(git *)|Bash(gh *)",
         "hooks": [
           {
