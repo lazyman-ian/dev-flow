@@ -88,36 +88,6 @@ design → create → validate → improve
 | `--type TYPE` | all | agent, skill, rule, or all |
 | `--threshold N` | 70 | Score threshold for recommendations |
 
-## Local Mode (No External Dependencies)
-
-When Braintrust is unavailable (missing Python modules, API issues, network), use local data sources.
-
-### Quick Check
-
-```bash
-# Test Braintrust availability
-uv run python -c "import requests" 2>/dev/null && echo "BRAINTRUST_OK" || echo "LOCAL_MODE"
-```
-
-### Local Data Sources
-
-| Source | Location | Contains | Extraction |
-|--------|----------|----------|------------|
-| Session JSONL | `~/.claude/projects/<proj>/*.jsonl` | Full transcripts | `jq` parsing |
-| Session index | `~/.claude/projects/<proj>/session-index` | Metadata | `jq .sessions` |
-| Stats cache | `~/.claude/projects/<proj>/stats-cache` | Token usage | `jq .sessions` |
-| Commit reasoning | `.git/claude/commits/*/reasoning.md` | Decisions | Read directly |
-| Ledgers | `thoughts/ledgers/` | Task completion | Read directly |
-
-### Local Workflow
-
-```
-[local evaluate] -> diagnose -> propose -> [approve] -> apply -> verify
-```
-
-The evaluate phase uses local session JSONL files instead of Braintrust API.
-Mark evaluation with `data_quality: "local"` to indicate limited data fidelity.
-
 ## Examples
 
 ```bash
@@ -174,76 +144,20 @@ This ensures human oversight on all prompt changes.
 | `braintrust_analyze.py` | Session data source (primary) |
 | Local JSONL parsing | Session data source (fallback) |
 
-## Troubleshooting
-
-| Issue | Solution |
-|-------|----------|
-| `requests module not installed` | Use Local Mode OR run `uv pip install requests` |
-| `aiohttp not found` | Use Local Mode OR run `uv pip install aiohttp` |
-| Braintrust API timeout | Use Local Mode (local files don't require network) |
-| Empty evaluation results | Check `~/.claude/projects/` for session files |
-
-**Tip**: Local Mode provides ~80% of evaluation quality for most use cases.
-
 ## Skill Development Guide
 
-### Creating a New Skill
+See `references/skill-development.md` for:
+- Creating new skills
+- SKILL.md frontmatter best practices
+- Skill quality checklist
+- Plugin development guidelines
 
-**File Structure:**
-```
-skills/<skill-name>/
-├── SKILL.md              # Main skill file (< 500 lines)
-└── references/           # Detailed docs (loaded on demand)
-    └── example.md
-```
+## Local Mode
 
-**SKILL.md Frontmatter:**
-```yaml
----
-name: skill-name
-description: What it does. Triggers on "keyword", "中文关键词".
-model: sonnet              # sonnet, opus, or haiku
-allowed-tools: [Read, Edit, Bash]
----
-```
-
-**Description Best Practices:**
-- Start with what it does (1 sentence)
-- Include trigger keywords (English + Chinese)
-- Use third person: "This skill should be used when..."
-- Max 1024 characters
-
-**Trigger Keywords:**
-- Include verbs: "create", "build", "fix", "analyze"
-- Include domain terms: "API", "database", "test"
-- Include Chinese equivalents
-
-### Skill Quality Checklist
-
-- [ ] Name: lowercase, alphanumeric + hyphens
-- [ ] Description: < 1024 chars, includes triggers
-- [ ] Allowed-tools: specific, not `[*]`
-- [ ] File: < 500 lines (prefer < 300)
-- [ ] Progressive loading: references/ for details
-- [ ] Examples: concrete usage scenarios
-
-### Plugin Development
-
-**Manifest (plugin.json):**
-```json
-{
-  "name": "plugin-name",
-  "version": "1.0.0",
-  "description": "...",
-  "skills": "./skills/",
-  "commands": "./commands/",
-  "mcpServers": "./.mcp.json"
-}
-```
-
-**Auto-discovered (don't declare):**
-- `agents/` directory
-- `hooks/hooks.json`
+See `references/local-mode.md` for:
+- Using without Braintrust
+- Local data sources
+- Troubleshooting common issues
 
 ## References
 
