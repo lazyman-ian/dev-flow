@@ -1,7 +1,7 @@
 {
   "name": "dev-flow",
-  "version": "3.13.0",
-  "description": "Unified development workflow: planning → coding → commit → PR → release with VDD (Verification-Driven Development)",
+  "version": "3.14.0",
+  "description": "Unified development workflow: planning → coding → commit → PR → release with VDD (Verification-Driven Development). Enhanced with design exploration, TDD mode, systematic debugging, and skill development guidance.",
   "author": {
     "name": "lazyman"
   },
@@ -19,7 +19,11 @@
     "meta-iterate",
     "self-improve",
     "vdd",
-    "verification"
+    "verification",
+    "brainstorm",
+    "tdd",
+    "debugging",
+    "skill-development"
   ],
   "skills": "./skills/",
   "commands": "./commands/",
