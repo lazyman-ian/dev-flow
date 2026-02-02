@@ -177,6 +177,14 @@ dev_tasks(action="list")
 
 ### 5.2 StatusLine 整合
 
+多行显示 (v3.13.0+):
+```
+████████░░ 76% | main | ↑2↓0 | !3M +2A | 15m
+✓ Read ×12 | ✓ Edit ×3 | ✓ Bash ×5
+Tasks: 2/5 (40%) | → 1 active | 2 pending
+```
+
+旧版单行格式:
 ```
 [main|DEVELOP] 12.5K 38% | Tasks: 1/3 ✓ | +50/-10
 ```

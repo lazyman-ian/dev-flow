@@ -475,10 +475,29 @@ dev-flow auto-enables these hooks:
 
 ### StatusLine
 
-StatusLine auto-displays:
-- Current phase (DEVELOPING, READY_TO_PUSH, etc.)
-- Error count
-- Context usage percentage (🟢🟡🔴)
+StatusLine multi-line display (v3.13.0+):
+
+```
+████████░░ 76% | main | ↑2↓0 | !3M +2A | 15m
+✓ Read ×12 | ✓ Edit ×3 | ✓ Bash ×5
+Tasks: 2/5 (40%) | → 1 active | 2 pending
+```
+
+**Line 1**: Context usage | Branch | ahead/behind | File stats | Session duration
+**Line 2**: Tool usage stats (Read/Edit/Bash/Grep)
+**Line 3**: Task progress (completed/total | active | pending)
+**Line 4**: Agent status (if any agents running)
+
+**Manual configuration** (if needed):
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "$HOME/.claude/plugins/marketplaces/lazyman-ian/dev-flow/scripts/statusline.sh",
+    "padding": 0
+  }
+}
+```
 
 ### Task Management
 

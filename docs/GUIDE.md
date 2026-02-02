@@ -477,10 +477,29 @@ dev-flow 自动启用以下 hooks:
 
 ### StatusLine
 
-StatusLine 自动显示:
-- 当前阶段 (DEVELOPING, READY_TO_PUSH, etc.)
-- 错误数量
-- Context 使用百分比 (🟢🟡🔴)
+StatusLine 多行显示 (v3.13.0+):
+
+```
+████████░░ 76% | main | ↑2↓0 | !3M +2A | 15m
+✓ Read ×12 | ✓ Edit ×3 | ✓ Bash ×5
+Tasks: 2/5 (40%) | → 1 active | 2 pending
+```
+
+**第1行**: 上下文使用率 | 分支 | ahead/behind | 文件统计 | 会话时长
+**第2行**: 工具使用统计 (Read/Edit/Bash/Grep)
+**第3行**: 任务进度 (完成/总数 | 进行中 | 待处理)
+**第4行**: Agent 状态 (如有运行中的 Agent)
+
+**手动配置** (如需要):
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "$HOME/.claude/plugins/marketplaces/lazyman-ian/dev-flow/scripts/statusline.sh",
+    "padding": 0
+  }
+}
+```
 
 ### Task Management
 

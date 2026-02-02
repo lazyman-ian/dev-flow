@@ -307,7 +307,20 @@ description: Create detailed implementation plans through interactive research.
 
 ## StatusLine 增强
 
-### 标准格式
+### 多行格式 (v3.13.0+)
+
+```
+████████░░ 76% | main | ↑2↓0 | !3M +2A | 15m
+✓ Read ×12 | ✓ Edit ×3 | ✓ Bash ×5
+Tasks: 2/5 (40%) | → 1 active | 2 pending
+```
+
+**第1行**: 上下文可视化进度条 | 分支 | ahead/behind | 文件统计(M/A/D) | 会话时长
+**第2行**: 工具使用统计 (Read/Edit/Bash/Grep 计数)
+**第3行**: 任务进度 (完成/总数 | 进行中 | 待处理)
+**第4行**: Agent 状态 (名称: 任务描述 时长)
+
+### 旧版单行格式
 
 ```
 45.2K 23% | main [DEV] ±6 | focus
