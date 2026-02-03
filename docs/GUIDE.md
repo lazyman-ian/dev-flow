@@ -42,8 +42,8 @@
 
 ```bash
 # 方式 1: 从 Marketplace 安装（推荐）
-claude marketplace add lazyman-ian https://github.com/lazyman-ian/claude-plugins.git
-claude plugins add dev-flow@lazyman-ian
+/plugin marketplace add lazyman-ian/claude-plugins
+/plugin install dev-flow@lazyman-ian
 
 # 方式 2: 本地开发
 claude plugins add /path/to/dev-flow

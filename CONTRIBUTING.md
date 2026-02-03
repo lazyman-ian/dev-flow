@@ -50,7 +50,7 @@ npm run dev       # Run with ts-node
 
 ```bash
 # Add as local plugin
-/plugins add /path/to/dev-flow
+/plugin marketplace add /path/to/dev-flow
 # Or: claude --plugin-dir /path/to/dev-flow
 
 # Verify
