@@ -20,6 +20,11 @@ fi
 OUTPUT=$(echo "$INPUT" | node "$SCRIPT_DIR/dist/session-start-continuity.mjs")
 
 # Branch change detection
+# Clear tool stats on new session start
+STATE_DIR="${HOME}/.claude/state/dev-flow"
+mkdir -p "$STATE_DIR"
+echo '{"read":0,"edit":0,"bash":0,"grep":0}' > "$STATE_DIR/tool_stats.json"
+
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 # Cross-platform hash: md5 on macOS, md5sum on Linux
 if command -v md5 &>/dev/null; then
