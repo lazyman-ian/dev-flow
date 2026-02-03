@@ -21,7 +21,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-3.13.0-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-3.14.0-blue.svg" alt="Version">
   <img src="https://img.shields.io/badge/Claude_Code-2.1.19+-purple.svg" alt="Claude Code">
   <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
   <img src="https://img.shields.io/badge/platforms-iOS%20%7C%20Android%20%7C%20Custom-orange.svg" alt="Platforms">
@@ -56,7 +56,7 @@
 
 ```bash
 # Add marketplace (one-time)
-claude plugins add-marketplace lazyman-ian --github lazyman-ian/claude-plugins
+claude marketplace add lazyman-ian https://github.com/lazyman-ian/claude-plugins.git
 
 # Install plugin
 claude plugins add dev-flow@lazyman-ian
@@ -67,6 +67,8 @@ claude plugins add dev-flow@lazyman-ian
 ```bash
 claude plugins add /path/to/dev-flow
 ```
+
+See [INSTALL.md](../INSTALL.md) for detailed installation guide including submodule handling.
 
 ### Verify
 

@@ -42,7 +42,7 @@
 
 ```bash
 # Option 1: From Marketplace (recommended)
-claude plugins add-marketplace lazyman-ian --github lazyman-ian/claude-plugins
+claude marketplace add lazyman-ian https://github.com/lazyman-ian/claude-plugins.git
 claude plugins add dev-flow@lazyman-ian
 
 # Option 2: Local development

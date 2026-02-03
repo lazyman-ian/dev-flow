@@ -42,7 +42,7 @@
 
 ```bash
 # 方式 1: 从 Marketplace 安装（推荐）
-claude plugins add-marketplace lazyman-ian --github lazyman-ian/claude-plugins
+claude marketplace add lazyman-ian https://github.com/lazyman-ian/claude-plugins.git
 claude plugins add dev-flow@lazyman-ian
 
 # 方式 2: 本地开发
