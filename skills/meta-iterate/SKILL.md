@@ -2,6 +2,7 @@
 name: meta-iterate
 description: Analyzes session performance and iterates agent/skill/rule prompts for self-improvement, and provides skill development guidance. This skill should be used when user says "improve prompts", "analyze sessions", "self-improve", "discover skills", "compound learnings", "learn from sessions", "优化工作流", "迭代agent", "分析session", "发现新skill", "积累经验", "学习总结", "提取规则", or when developing skills with "write skill", "create skill", "开发 skill", "插件开发", "skill development". Triggers on /meta-iterate, 自我改进, 会话分析, prompt优化, skill开发.
 model: opus
+memory: user
 context: fork
 allowed-tools: [Read, Glob, Grep, Write, Edit, Bash, WebSearch, Task, TaskCreate, TaskUpdate, TaskList, AskUserQuestion]
 ---

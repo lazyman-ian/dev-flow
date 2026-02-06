@@ -2,6 +2,7 @@
 name: debugging
 description: Systematic debugging using 4-phase root cause analysis with subagent-driven rapid iteration. This skill should be used when user says "debug", "调试", "troubleshoot", "diagnose", "排查", "修复 bug", "fix bug", "investigate", "analyze crash". Triggers on /debug, 调试, 排查问题, 修复错误.
 model: opus
+memory: project
 context: fork
 allowed-tools: [Read, Glob, Grep, Edit, Write, Bash, Task, TaskCreate, TaskUpdate, TaskList, AskUserQuestion]
 ---

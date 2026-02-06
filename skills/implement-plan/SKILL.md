@@ -2,6 +2,7 @@
 name: implement-plan
 description: Executes implementation plans with TDD and agent orchestration. This skill should be used when user says "implement plan", "execute plan", "follow the plan", "start implementation", "按计划实现", "执行方案", "开始实现", "实现功能", or when using TDD with "use tdd", "test driven", "测试驱动", "red green refactor". Triggers on /implement_plan, 执行计划, 代码实现, TDD开发, 测试驱动.
 model: opus
+memory: project
 context: fork
 allowed-tools: [Read, Glob, Grep, Edit, Write, Bash, Task, TaskCreate, TaskUpdate, TaskList, TaskGet]
 ---

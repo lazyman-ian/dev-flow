@@ -2,6 +2,7 @@
 name: dev
 description: Provides development workflow hub for git operations, commits, PRs, and releases. This skill should be used when user says "commit", "push", "create PR", "release", "git status", "check status", "提交代码", "推送", "创建PR", "发布版本", "查看状态". Triggers on /dev, /commit, /pr, /release, 代码提交, 版本发布, git操作.
 model: sonnet
+memory: project
 allowed-tools: [Bash, Read, Glob, Grep, Edit, Write, mcp__plugin_dev-flow_dev-flow__*]
 ---
 

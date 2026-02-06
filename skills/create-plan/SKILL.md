@@ -2,6 +2,7 @@
 name: create-plan
 description: Creates detailed implementation plans through interactive research and design exploration. This skill should be used when user says "create plan", "make a plan", "design architecture", "plan feature", "制定计划", "设计方案", "规划功能", "架构设计", or when exploring design options with "brainstorm", "explore options", "设计讨论", "细化方案". Triggers on /create_plan, 实现计划, 功能规划, 技术方案, 设计探索.
 model: opus
+memory: project
 allowed-tools: [Read, Glob, Grep, WebSearch, Task, TaskCreate, TaskUpdate]
 ---
 
